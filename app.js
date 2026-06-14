@@ -760,7 +760,7 @@ document.addEventListener("alpuraDataLoaded", () => {
       };
 
       if (isOnlyGeoDistance) {
-        if (!confirm("Advertencia: La distancia de la geolocalización supera el umbral permitido. ¿Desea continuar exportando el formulario con esta advertencia?")) {
+        if (!confirm("Advertencia: La distancia de la geolocalización supera el umbral permitido. ¿Desea continuar exportando el formulario?")) {
           doScroll();
           return;
         }
@@ -1571,7 +1571,10 @@ document.addEventListener("alpuraDataLoaded", () => {
         const segmentaciones = window.ALPURA_MOCK_DATA?.segmentacionesMercado || [];
 
         const ws = workbook.addWorksheet('Plantilla');
-        ws.addRow(HEADERS_ESPERADOS);
+        ws.columns = HEADERS_ESPERADOS.map(header => ({
+          header: header,
+          width: header.length + 6 // Ajuste de ancho para legibilidad
+        }));
         ws.getRow(1).font = { bold: true };
 
         const subcanalesStr = '"' + subcanales.join(',') + '"';
@@ -1624,11 +1627,6 @@ document.addEventListener("alpuraDataLoaded", () => {
           document.getElementById("masivo-view").classList.remove("active");
         }
       });
-    }
-
-    function aMayusculasSinAcentos(str) {
-      if (!str) return "";
-      return str.replace(/Ñ/gi, "&&NTILDE&&").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/&&NTILDE&&/gi, "Ñ").toUpperCase();
     }
 
     function aMayusculasSinAcentosYUnEspacio(str) {
@@ -1709,7 +1707,9 @@ document.addEventListener("alpuraDataLoaded", () => {
         const canal = "DETALLE"; // Fijo como solicitó el usuario
         const ticketValue = document.getElementById("ticketInputMasivo").value.trim();
         const text = (e.clipboardData || window.clipboardData).getData("text");
-        const rows = text.trim().split("\n").map(r => r.split("\t"));
+        // Usar replace en lugar de trim() para evitar perder tabulaciones finales (celdas vacías) en la última fila
+        const cleanText = text.replace(/[\r\n]+$/, "");
+        const rows = cleanText.split(/\r?\n/).map(r => r.split("\t"));
         if (rows.length < 2) {
           return alert("⚠️ Los datos pegados deben incluir los encabezados y al menos una fila de datos.");
         }
@@ -2307,7 +2307,10 @@ document.addEventListener("alpuraDataLoaded", () => {
         const workbook = new ExcelJS.Workbook();
         const ws = workbook.addWorksheet('Requerimiento');
         const headers = columnasDeseadas.map(col => col.titulo);
-        ws.addRow(headers);
+        ws.columns = headers.map(header => ({
+          header: header,
+          width: header.length + 6 // Ajuste de ancho para legibilidad
+        }));
         ws.getRow(1).font = { bold: true };
 
         filas.forEach(tr => {
