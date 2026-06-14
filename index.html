@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RTM Alpura - Registro de Clientes</title>
+  <!-- Google Fonts para tipografía premium -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Estilos principales -->
+  <link rel="stylesheet" href="styles.css">
+
+
+
+  <!-- Librerías ExcelJS y FileSaver para exportar a Excel con listas desplegables -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+
+<body>
+
+  <!-- ================= OVERLAY DE CARGA ================= -->
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Cargando catálogos de RTM Alpura...</div>
+  </div>
+
+  <!-- ================= PANTALLA DE INICIO (MENÚ) ================= -->
+  <div id="home-view" class="view active">
+    <div class="home-container">
+      <header class="home-header-centered">
+        <img src="alpura_logo.png" alt="Logo Alpura" class="logo-alpura-centered">
+        <h2
+          style="margin-top: 5px; color: #084475; font-family: 'Outfit', sans-serif; font-weight: 800; letter-spacing: -0.5px; font-size: 2.5rem; text-align: center;">
+          Route To Market</h2>
+      </header>
+
+      <main class="home-main">
+        <h1 class="home-title">Solicitudes de Registro de Clientes.</h1>
+        <p class="home-subtitle">Seleccione el tipo de registro que desea realizar.</p>
+
+        <div class="menu-grid">
+          <!-- Tarjeta Registro Individual -->
+          <div class="menu-card" id="btn-to-individual">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" width="48" height="48">
+                <path
+                  d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+                  fill="#084475" />
+              </svg>
+            </div>
+            <h3>Registro Cliente Individual</h3>
+            <p>Formulario individual con validación geográfica, fiscal y comercial.</p>
+            <span class="card-action-text">Iniciar Solicitud &rarr;</span>
+          </div>
+
+          <!-- Tarjeta Registro Sucursal -->
+          <div class="menu-card" id="btn-to-sucursal">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" width="48" height="48">
+                <path
+                  d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm14 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"
+                  fill="#084475" />
+              </svg>
+            </div>
+            <h3>Registro de Sucursal</h3>
+            <p>Formulario para sucursales o puntos de entrega vinculados a un cliente.</p>
+            <span class="card-action-text">Iniciar solicitud &rarr;</span>
+          </div>
+
+          <!-- Tarjeta Registro Masivo -->
+          <div class="menu-card" id="btn-to-masivo">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" width="48" height="48">
+                <path
+                  d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"
+                  fill="#084475" />
+              </svg>
+            </div>
+            <h3>Registro Masivo</h3>
+            <p>Solicitudes por lote de clientes canal DETALLE con validación geográfica y comercial.</p>
+            <span class="card-action-text">Cargar datos &rarr;</span>
+          </div>
+        </div>
+      </main>
+
+      <footer class="home-footer">
+        <p>&copy; 2026 alpura. Todos los derechos reservados. Road To Market. Sistema de Control de Datos | Clientes.
+        </p>
+      </footer>
+    </div>
+  </div>
+
+
+  <!-- ================= FORMULARIO REGISTRO INDIVIDUAL ================= -->
+  <div id="individual-view" class="view">
+    <div class="form-container">
+
+      <!-- Cabecera de Formulario -->
+      <header class="form-header">
+        <button class="btn-back" id="btn-back-1">
+          <svg viewBox="0 0 24 24" width="18" height="18">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor" />
+          </svg>
+          Volver a Inicio
+        </button>
+        <div class="form-header-logos">
+          <h2>Solicitud de Alta de Cliente</h2>
+          <span class="badge">RTM - Road to Market</span>
+        </div>
+      </header>
+
+      <!-- Formulario Principal -->
+      <form id="individual-client-form" novalidate>
+
+        <!-- SECCIÓN 1: IDENTIFICACIÓN Y DOMICILIO -->
+        <div class="form-section">
+          <h3 class="section-title">1. Datos de identificación y domicilio</h3>
+          <div class="grid-container">
+
+            <!-- Nombre o Razon Social -->
+            <div class="col-12 field-group">
+              <label for="nombre-social">* NOMBRE O RAZÓN SOCIAL:</label>
+              <input type="text" id="nombre-social" required placeholder="RAZÓN SOCIAL COMPLETA">
+              <span class="error-msg">Este campo es requerido (solo letras, números y Ñ).</span>
+            </div>
+
+            <!-- Nombre Comercial -->
+            <div class="col-12 field-group">
+              <label for="nombre-comercial">* NOMBRE COMERCIAL:</label>
+              <input type="text" id="nombre-comercial" required
+                placeholder="NOMBRE COMERCIAL O NOMBRE DEL ESTABLECIMIENTO">
+              <span class="error-msg">Este campo es requerido.</span>
+            </div>
+
+            <!-- Calle y Número -->
+            <div class="col-4 field-group">
+              <label for="calle">* CALLE:</label>
+              <input type="text" id="calle" required placeholder="CALLE">
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+            <div class="col-2 field-group">
+              <label for="numero">* NÚMERO:</label>
+              <input type="text" id="numero" required placeholder="EXT e INT o S/N">
+              <span class="error-msg">Requerido (admite S/N).</span>
+            </div>
+
+            <div class="col-3 field-group bg-muted">
+              <label for="entre-calle">ENTRE CALLE:</label>
+              <input type="text" id="entre-calle" placeholder="CALLE 1">
+              <span class="error-msg"></span>
+            </div>
+
+            <div class="col-3 field-group bg-muted">
+              <label for="y-calle">Y CALLE:</label>
+              <input type="text" id="y-calle" placeholder="CALLE 2">
+              <span class="error-msg"></span>
+            </div>
+
+            <!-- CP, Colonia, Estado y Municipio -->
+            <div class="col-2 field-group">
+              <label for="codigo-postal">* CÓDIGO POSTAL:</label>
+              <input type="text" id="codigo-postal" required maxlength="5" placeholder="5 DÍGITOS">
+              <span class="error-msg">Inválido o no existente.</span>
+            </div>
+
+            <div class="col-4 field-group">
+              <label for="colonia">* COLONIA:</label>
+              <select id="colonia" required>
+                <option value="">Registre un C.P. primero</option>
+              </select>
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+            <div class="col-3 field-group">
+              <label for="estado">* ESTADO:</label>
+              <input type="text" id="estado" readonly class="locked" placeholder="ESTADO AUTO-RELLENADO">
+            </div>
+
+            <div class="col-3 field-group">
+              <label for="municipio">* ALCALDÍA O MUNICIPIO:</label>
+              <input type="text" id="municipio" readonly class="locked" placeholder="MUNICIPIO AUTO-RELLENADO">
+            </div>
+
+            <!-- Latitud y Longitud -->
+            <div class="col-6 field-group">
+              <label for="latitud">LATITUD (##.000000):</label>
+              <input type="text" id="latitud" placeholder="ej. 19.432608">
+              <span class="error-msg">Formato numérico ##.######</span>
+            </div>
+
+            <div class="col-6 field-group">
+              <label for="longitud">LONGITUD (-##.000000):</label>
+              <input type="text" id="longitud" placeholder="ej. -99.133208">
+              <span class="error-msg">Formato numérico con signo negativo.</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SECCIÓN 2: DATOS FISCALES -->
+        <div class="form-section section-fiscal bg-fiscal-light">
+          <h3 class="section-title text-fiscal">2. Datos de pago y facturación</h3>
+          <div class="grid-container">
+
+            <div class="col-4 field-group">
+              <label for="tipo-cliente">* TIPO DE CLIENTE:</label>
+              <select id="tipo-cliente" required>
+                <option value="">Seleccione...</option>
+              </select>
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+            <div class="col-4 field-group">
+              <label for="forma-pago">* FORMA DE PAGO:</label>
+              <select id="forma-pago" required>
+                <option value="">Seleccione...</option>
+              </select>
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+            <div class="col-4 field-group">
+              <label for="tipo-factura">* TIPO DE FACTURA:</label>
+              <select id="tipo-factura" required>
+                <option value="">Seleccione...</option>
+              </select>
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+            <div class="col-4 field-group bg-fiscal">
+              <label for="rfc">RFC:</label>
+              <input type="text" id="rfc" maxlength="13" placeholder="3-4 Letras + 6 Números + Homoclave">
+              <span class="error-msg">Formato de RFC incorrecto (12 o 13 carac. sin guiones).</span>
+            </div>
+
+            <div class="col-4 field-group bg-fiscal">
+              <label for="regimen-fiscal">RÉGIMEN FISCAL:</label>
+              <select id="regimen-fiscal">
+                <option value="">Seleccione...</option>
+              </select>
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+            <div class="col-4 field-group bg-fiscal">
+              <label for="uso-cfdi">USO DE CFDI:</label>
+              <select id="uso-cfdi">
+                <option value="">Seleccione Régimen primero...</option>
+              </select>
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SECCIÓN 3: CONTACTOS -->
+        <div class="form-section">
+          <h3 class="section-title">3. Datos de contacto</h3>
+          <table class="contacts-table">
+            <thead>
+              <tr>
+                <th style="width: 20%;">Área</th>
+                <th style="width: 40%;">Nombre Completo</th>
+                <th style="width: 25%;">eMAIL</th>
+                <th style="width: 15%;">Teléfono</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Representante Legal -->
+              <tr>
+                <td><strong>REP. LEGAL:</strong></td>
+                <td class="field-group-inline">
+                  <input type="text" id="rep-nombre" placeholder="NOMBRE COMPLETO">
+                </td>
+                <td class="field-group-inline">
+                  <input type="email" id="rep-email" placeholder="email@dominio.com">
+                </td>
+                <td class="field-group-inline">
+                  <input type="text" id="rep-telefono" maxlength="10" placeholder="10 DÍGITOS">
+                </td>
+              </tr>
+              <!-- Envío de Facturas -->
+              <tr>
+                <td><strong>ENVÍO DE FACTURAS:</strong> <span class="lbl-factura-req"
+                    style="display:none; color:var(--accent-color); font-size:10px;">* (Requerido para
+                    INDIVIDUAL)</span></td>
+                <td class="field-group-inline">
+                  <input type="text" id="fac-nombre" placeholder="NOMBRE COMPLETO">
+                </td>
+                <td class="field-group-inline">
+                  <input type="email" id="fac-email" placeholder="email@dominio.com">
+                </td>
+                <td class="field-group-inline">
+                  <input type="text" id="fac-telefono" maxlength="10" placeholder="10 DÍGITOS">
+                </td>
+              </tr>
+              <!-- Contacto Comercial -->
+              <tr>
+                <td><strong>CONTACTO COMERCIAL:</strong></td>
+                <td class="field-group-inline">
+                  <input type="text" id="com-nombre" placeholder="NOMBRE COMPLETO">
+                </td>
+                <td class="field-group-inline">
+                  <input type="email" id="com-email" placeholder="email@dominio.com">
+                </td>
+                <td class="field-group-inline">
+                  <input type="text" id="com-telefono" maxlength="10" placeholder="10 DÍGITOS">
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- SECCIÓN 4: CRÉDITO Y COBRANZA -->
+        <div class="form-section section-cobranza bg-cobranza-light">
+          <h3 class="section-title text-cobranza">4. Crédito y Cobranza</h3>
+          <div class="grid-container">
+
+            <div class="col-2-4 field-group bg-cobranza">
+              <label for="limite-credito">LÍMITE DE CRÉDITO ($):</label>
+              <input type="text" id="limite-credito" placeholder="Solo números">
+              <span class="error-msg">Debe ser un número válido.</span>
+            </div>
+
+            <div class="col-2-4 field-group bg-cobranza">
+              <label for="grupo-concentrador">GRUPO CONCENTRADOR:</label>
+              <select id="grupo-concentrador">
+                <option value="">Seleccione...</option>
+              </select>
+            </div>
+
+            <div class="col-2-4 field-group bg-cobranza">
+              <label for="zona-cobranza">ZONA DE COBRANZA:</label>
+              <select id="zona-cobranza">
+                <option value="">Seleccione...</option>
+              </select>
+            </div>
+
+            <div class="col-2-4 field-group bg-cobranza">
+              <label for="responsable-cobranza">RESP. DE COBRANZA:</label>
+              <select id="responsable-cobranza">
+                <option value="">Seleccione...</option>
+              </select>
+            </div>
+
+            <div class="col-2-4 field-group bg-cobranza">
+              <label for="dias-pago-select">DÍAS DE PAGO:</label>
+              <!-- Selector multiselección estilizado -->
+              <div class="custom-multiselect">
+                <div class="multiselect-trigger" id="dias-pago-trigger">Seleccione días...</div>
+                <div class="multiselect-dropdown" id="dias-pago-dropdown">
+                  <label><input type="checkbox" value="LUNES"> LUNES</label>
+                  <label><input type="checkbox" value="MARTES"> MARTES</label>
+                  <label><input type="checkbox" value="MIERCOLES"> MIÉRCOLES</label>
+                  <label><input type="checkbox" value="JUEVES"> JUEVES</label>
+                  <label><input type="checkbox" value="VIERNES"> VIERNES</label>
+                  <label><input type="checkbox" value="SABADO"> SÁBADO</label>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SECCIÓN 5: LOGÍSTICA DE DISTRIBUCIÓN -->
+        <div class="form-section">
+          <h3 class="section-title">5. Logística de distribución</h3>
+          <div class="grid-container">
+
+            <div class="col-3 field-group">
+              <label for="cedis-asignado">* CEDIS ASIGNADO:</label>
+              <select id="cedis-asignado" required>
+                <option value="">Seleccione...</option>
+              </select>
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+            <div class="col-3 field-group">
+              <label for="plaza-distribucion">* PLAZA DE DISTRIBUCIÓN:</label>
+              <select id="plaza-distribucion" required>
+                <option value="">Seleccione CEDIS primero...</option>
+              </select>
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+            <div class="col-2 field-group">
+              <label for="ruta">RUTA:</label>
+              <select id="ruta">
+                <option value="">Seleccione...</option>
+              </select>
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+            <!-- Días de Visita al lado de Ruta -->
+            <div class="col-4 field-group bg-light">
+              <label>DIAS DE VISITA:</label>
+              <div class="visita-checkboxes">
+                <label class="chk-item"><input type="checkbox" name="visita" value="L"><span>L</span></label>
+                <label class="chk-item"><input type="checkbox" name="visita" value="M"><span>M</span></label>
+                <label class="chk-item"><input type="checkbox" name="visita" value="MR"><span>MR</span></label>
+                <label class="chk-item"><input type="checkbox" name="visita" value="J"><span>J</span></label>
+                <label class="chk-item"><input type="checkbox" name="visita" value="V"><span>V</span></label>
+                <label class="chk-item"><input type="checkbox" name="visita" value="S"><span>S</span></label>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SECCIÓN 6: ESTRUCTURA COMERCIAL E IBP -->
+        <div class="form-section">
+          <h3 class="section-title">6. Clasficación comercial</h3>
+          <div class="grid-container">
+
+            <div class="col-2 field-group bg-disabled">
+              <label for="macrocanal">MACROCANAL:</label>
+              <input type="text" id="macrocanal" readonly class="locked" placeholder="Autocompletado">
+            </div>
+
+            <div class="col-2 field-group">
+              <label for="canal-venta">* CANAL DE VENTA:</label>
+              <select id="canal-venta" required>
+                <option value="">Seleccione...</option>
+              </select>
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+            <div class="col-2 field-group">
+              <label for="subcanal">* SUBCANAL:</label>
+              <select id="subcanal" required>
+                <option value="">Seleccione Canal primero...</option>
+              </select>
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+            <div class="col-2 field-group">
+              <label for="giro">* GIRO:</label>
+              <select id="giro" required>
+                <option value="">Seleccione Canal primero...</option>
+              </select>
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+            <div class="col-2 field-group">
+              <label for="agrupacion-clientes">* AGRUP CLIENTES:</label>
+              <select id="agrupacion-clientes" required>
+                <option value="">Seleccione Canal primero...</option>
+              </select>
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+            <div class="col-2 field-group">
+              <label for="tipo-cuenta">* TIPO DE CUENTA:</label>
+              <select id="tipo-cuenta" required>
+                <option value="">Seleccione...</option>
+              </select>
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+            <div class="col-2-4 field-group">
+              <label for="zona-nielsen">* ZONA NIELSEN:</label>
+              <select id="zona-nielsen" required>
+                <option value="">Seleccione...</option>
+              </select>
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+            <div class="col-2-4 field-group">
+              <label for="tipo-entrega">* TIPO DE ENTREGA:</label>
+              <select id="tipo-entrega" required>
+                <option value="">Seleccione...</option>
+              </select>
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+            <div class="col-2-4 field-group">
+              <label for="regional-responsable">* REG RESPONSABLE:</label>
+              <select id="regional-responsable" required>
+                <option value="">Seleccione...</option>
+              </select>
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+            <div class="col-2-4 field-group">
+              <label for="clasificacion-interna">* CLASIF INTERNA:</label>
+              <select id="clasificacion-interna" required>
+                <option value="">Seleccione...</option>
+              </select>
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+            <div class="col-2-4 field-group">
+              <label for="segmentacion-mercado">* SEGMENTACIÓN DE MERCADO:</label>
+              <select id="segmentacion-mercado" required>
+                <option value="">Seleccione...</option>
+              </select>
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+            <div class="col-6 field-group bg-disabled">
+              <label for="canal-venta-ibp">CANAL DE VENTA IBP:</label>
+              <input type="text" id="canal-venta-ibp" readonly class="locked" placeholder="Autocompletado">
+            </div>
+
+            <div class="col-6 field-group">
+              <label for="agrupacion-ibp">* AGRUPACIÓN IBP:</label>
+              <select id="agrupacion-ibp" required>
+                <option value="">Seleccione Canal primero...</option>
+              </select>
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SECCIÓN 7: CIERRE Y FIRMA -->
+        <div class="form-section">
+          <h3 class="section-title">7. Control y Observaciones</h3>
+          <div class="grid-container">
+
+            <div class="col-8 field-group">
+              <label for="solicito">* SOLICITÓ (Nombre del Gestor):</label>
+              <input type="text" id="solicito" required placeholder="NOMBRE DE QUIEN SOLICITA EL REGISTRO">
+              <span class="error-msg">Requerido.</span>
+            </div>
+
+            <div class="col-4 field-group">
+              <label for="fecha">* FECHA:</label>
+              <input type="text" id="fecha" readonly class="locked" placeholder="DD/MM/AAAA">
+            </div>
+
+            <div class="col-12 field-group">
+              <label for="observaciones">OBSERVACIONES (Máximo 500 caracteres, libre de caracteres especiales):</label>
+              <textarea id="observaciones" rows="4" maxlength="500"
+                placeholder="Escriba comentarios adicionales aquí..."></textarea>
+              <div class="char-counter"><span id="observaciones-count">0</span> / 500</div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="form-actions-bar">
+          <button type="button" class="btn-action btn-menu" id="btn-back-menu">
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor" />
+            </svg>
+            Volver a Inicio
+          </button>
+          <button type="button" class="btn-action btn-clear" id="btn-clear-form">
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path
+                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                fill="currentColor" />
+            </svg>
+            Limpiar Formulario
+          </button>
+          <button type="submit" class="btn-action btn-generate" id="btn-submit-form">
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path
+                d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 9l-5 5-5-5h3V5h4v4h3z"
+                fill="currentColor" />
+            </svg>
+            Generar Solicitud
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+
+  <!-- ================= VISTA DE CORTESÍA: REGISTRO DE SUCURSAL ================= -->
+  <div id="sucursal-view" class="view">
+    <div class="form-container">
+      <header class="form-header">
+        <button class="btn-back" id="btn-back-2">
+          <svg viewBox="0 0 24 24" width="18" height="18">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor" />
+          </svg>
+          Volver a Inicio
+        </button>
+        <div class="form-header-logos">
+          <h2>Registro de Sucursal / Punto de Entrega</h2>
+          <span class="badge">Módulo Adicional</span>
+        </div>
+      </header>
+
+      <form id="sucursal-form" novalidate>
+
+        <!-- GLOBAL HEADER -->
+        <div class="form-section">
+          <div class="grid-container" style="margin-top: 0;">
+            <div class="col-4 field-group">
+              <label for="suc-num-cliente">* NUM. CLIENTE:</label>
+              <input type="text" id="suc-num-cliente" required placeholder="5 o 6 DÍGITOS">
+              <span class="error-msg">Debe ser de 5 o 6 dígitos numéricos.</span>
+            </div>
+            <div class="col-8 field-group">
+              <label for="suc-razon-social">RAZÓN SOCIAL:</label>
+              <input type="text" id="suc-razon-social" placeholder="RAZÓN SOCIAL COMPLETA">
+              <span class="error-msg">Formato incorrecto.</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="sucursales-container">
+          <!-- PLANTILLA SUCURSAL -->
+          <div class="form-section sucursal-block" data-index="1">
+            <h3 class="section-title">SUCURSAL <span class="sucursal-number">1</span>:</h3>
+            <div class="grid-container">
+
+              <!-- ROW 1 -->
+              <div class="col-4 field-group">
+                <label>* CALLE:</label>
+                <input type="text" name="sucursal-calle" required placeholder="CALLE">
+                <span class="error-msg">Requerido.</span>
+              </div>
+              <div class="col-2 field-group">
+                <label>* NÚMERO:</label>
+                <input type="text" name="sucursal-numero" required placeholder="EXT e INT o S/N">
+                <span class="error-msg">Requerido.</span>
+              </div>
+              <div class="col-3 field-group bg-muted">
+                <label>ENTRE CALLE:</label>
+                <input type="text" name="sucursal-entre-calle" placeholder="CALLE 1">
+              </div>
+              <div class="col-3 field-group bg-muted">
+                <label>Y CALLE:</label>
+                <input type="text" name="sucursal-y-calle" placeholder="CALLE 2">
+              </div>
+
+              <!-- ROW 2 -->
+              <div class="col-2 field-group">
+                <label>* CÓDIGO POSTAL:</label>
+                <input type="text" name="sucursal-codigo-postal" required maxlength="5" placeholder="5 DÍGITOS">
+                <span class="error-msg">CP Inválido.</span>
+              </div>
+              <div class="col-4 field-group">
+                <label>* COLONIA:</label>
+                <select name="sucursal-colonia" required>
+                  <option value="">Registre un C.P. primero</option>
+                </select>
+                <span class="error-msg">Requerido.</span>
+              </div>
+              <div class="col-3 field-group">
+                <label>* ESTADO:</label>
+                <input type="text" name="sucursal-estado" readonly class="locked" placeholder="AUTO-RELLENADO">
+              </div>
+              <div class="col-3 field-group">
+                <label>* MUNICIPIO:</label>
+                <input type="text" name="sucursal-municipio" readonly class="locked" placeholder="AUTO-RELLENADO">
+              </div>
+
+              <!-- ROW 3 -->
+              <div class="col-6 field-group">
+                <label>LATITUD (##.000000):</label>
+                <input type="text" name="sucursal-latitud" placeholder="ej. 19.432608">
+                <span class="error-msg">Requerido. Formato numérico ##.######</span>
+              </div>
+              <div class="col-6 field-group">
+                <label>LONGITUD (-##.000000):</label>
+                <input type="text" name="sucursal-longitud" placeholder="ej. -99.133208">
+                <span class="error-msg">Requerido. Formato numérico con signo.</span>
+              </div>
+
+              <!-- Separador / Sección Comercial -->
+              <div class="col-12" style="margin-top: 10px;"></div>
+
+              <!-- ROW 4 -->
+              <div class="col-3 field-group">
+                <label>DETERMINANTE:</label>
+                <input type="text" name="sucursal-determinante">
+              </div>
+              <div class="col-3 field-group">
+                <label>* NOMBRE DE SUCURSAL:</label>
+                <input type="text" name="sucursal-nombre" required>
+                <span class="error-msg">Requerido.</span>
+              </div>
+              <div class="col-2 field-group">
+                <label>RETEK:</label>
+                <input type="text" name="sucursal-retek">
+              </div>
+              <div class="col-2 field-group">
+                <label>GLN:</label>
+                <input type="text" name="sucursal-gln">
+              </div>
+              <div class="col-2 field-group">
+                <label>UNIDAD DE FACTURACIÓN:</label>
+                <select name="sucursal-unidad-facturacion">
+                  <option value="PIEZAS" selected>PIEZAS</option>
+                  <option value="CAJAS">CAJAS</option>
+                  <option value="TARIMAS">TARIMAS</option>
+                </select>
+              </div>
+
+              <!-- ROW 5 -->
+              <div class="col-2 field-group">
+                <label>* CEDIS ASIGNADO:</label>
+                <select name="sucursal-cedis" class="select-cedis" required>
+                  <option value="">Seleccione...</option>
+                </select>
+                <span class="error-msg">Requerido.</span>
+              </div>
+              <div class="col-2 field-group">
+                <label>* PLAZA DE DISTRIBUCIÓN:</label>
+                <select name="sucursal-plaza" class="select-plaza" required>
+                  <option value="">Seleccione...</option>
+                </select>
+                <span class="error-msg">Requerido.</span>
+              </div>
+              <div class="col-2 field-group">
+                <label>* ZONA NIELSEN:</label>
+                <select name="sucursal-zona-nielsen" class="select-zona" required>
+                  <option value="">Seleccione...</option>
+                </select>
+                <span class="error-msg">Requerido.</span>
+              </div>
+              <div class="col-2 field-group">
+                <label>* TIPO DE ENTREGA:</label>
+                <select name="sucursal-tipo-entrega" class="select-entrega" required>
+                  <option value="">Seleccione...</option>
+                </select>
+                <span class="error-msg">Requerido.</span>
+              </div>
+              <div class="col-2 field-group">
+                <label>* REG RESPONSABLE:</label>
+                <select name="sucursal-regional" class="select-regional" required>
+                  <option value="">Seleccione...</option>
+                </select>
+                <span class="error-msg">Requerido.</span>
+              </div>
+              <div class="col-1 field-group">
+                <label>* CLASIF INT:</label>
+                <select name="sucursal-clasif" class="select-clasif" required>
+                  <option value="">Seleccione...</option>
+                </select>
+                <span class="error-msg">Requerido.</span>
+              </div>
+              <div class="col-1 field-group">
+                <label>* SEG. MDO.:</label>
+                <select name="sucursal-segmentacion" class="select-segmentacion" required>
+                  <option value="">Seleccione...</option>
+                </select>
+                <span class="error-msg">Requerido.</span>
+              </div>
+
+              <!-- Separador / Pedidos Centralizados -->
+              <div class="col-12" style="margin-top: 10px;"></div>
+
+              <div class="col-2 field-group" style="display:flex; align-items:center;">
+                <span style="font-weight:700; color:var(--primary-color);">PEDIDOS CENTRALIZADOS</span>
+              </div>
+              <div class="col-2 field-group bg-cobranza-light">
+                <label>PERFIL:</label>
+                <input type="text" name="sucursal-perfil">
+              </div>
+              <div class="col-2 field-group bg-cobranza-light">
+                <label>LISTA DE PRECIOS:</label>
+                <input type="text" name="sucursal-lista-precios">
+              </div>
+              <div class="col-2 field-group bg-cobranza-light">
+                <label>NÚM PROVEEDOR:</label>
+                <input type="text" name="sucursal-num-proveedor">
+              </div>
+              <div class="col-2 field-group bg-cobranza-light">
+                <label>PEDIDO 01:</label>
+                <input type="text" name="sucursal-pedido-01">
+              </div>
+              <div class="col-2 field-group bg-cobranza-light">
+                <label>PEDIDO 02:</label>
+                <input type="text" name="sucursal-pedido-02">
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions-bar">
+          <button type="button" class="btn-action btn-menu" id="btn-back-menu-suc">
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor" />
+            </svg>
+            Regresar
+          </button>
+          <button type="button" class="btn-action btn-clear" id="btn-add-sucursal">
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor" />
+            </svg>
+            Agregar Sucursal
+          </button>
+          <button type="button" class="btn-action btn-generate" id="btn-generate-sucursal">
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path
+                d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 9l-5 5-5-5h3V5h4v4h3z"
+                fill="currentColor" />
+            </svg>
+            Generar Solicitud
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ================= VISTA DE CORTESÍA: REGISTRO MASIVO ================= -->
+  <div id="masivo-view" class="view">
+    <div class="form-container">
+      <header class="form-header">
+        <button class="btn-back" id="btn-back-masivo">
+          <svg viewBox="0 0 24 24" width="18" height="18">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor" />
+          </svg>
+          Volver a Inicio
+        </button>
+        <div class="form-header-logos">
+          <h2>Carga Masiva de Clientes RTM</h2>
+          <span class="badge">Procesamiento por Lotes</span>
+        </div>
+      </header>
+
+      <div class="form-section">
+        <div class="grid-container" style="margin-top: 0;">
+          <div class="col-6 field-group">
+            <label for="cedisSelectMasivo"><strong>* CEDIS ASIGNADO:</strong></label>
+            <select id="cedisSelectMasivo">
+              <option value="">-- Selecciona un CEDIS --</option>
+            </select>
+          </div>
+          <div class="col-6 field-group">
+            <label for="ticketInputMasivo"><strong>NÚMERO DE TICKET:</strong></label>
+            <input type="text" id="ticketInputMasivo" placeholder="Número de ticket">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3 class="section-title">📋 Validar datos:</h3>
+        <p class="sub-text" style="margin-bottom: 10px;">Copia y pega los datos de la plantilla de Excel con encabezados
+          incluidos. Asegúrate seleccionar todas las columnas requeridas.</p>
+
+        <!-- Área para pegar datos desde Excel (estilizada) -->
+        <textarea id="pasteAreaMasivo"
+          placeholder="Haz clic aquí y presiona Ctrl+V para pegar los datos con encabezados..."
+          style="width: 100%; height: 80px; padding: 10px; border: 1px dashed var(--primary-color); border-radius: 8px; font-family: inherit; resize: vertical;"></textarea>
+
+        <!-- Barra de herramientas -->
+        <div class="form-actions-bar"
+          style="justify-content: flex-start; gap: 8px; flex-wrap: nowrap; margin-bottom: 15px; background: none; padding: 0; box-shadow: none;">
+          <button type="button" class="btn-action btn-menu" id="downloadTemplateBtnMasivo"
+            style="padding: 8px 12px; font-size: 0.85rem;">⬇️ Descargar plantilla</button>
+          <button type="button" class="btn-action btn-generate" id="exportBtnMasivo"
+            style="padding: 8px 12px; font-size: 0.85rem;">⬇️ Generar requerimiento</button>
+          <button type="button" class="btn-action btn-menu" id="exportCsvBtnMasivo"
+            style="padding: 8px 12px; font-size: 0.85rem;">⬇️ CSV's</button>
+          <button type="button" class="btn-action btn-clear" id="deleteRowsBtnMasivo"
+            style="padding: 8px 12px; font-size: 0.85rem; margin-left: auto;">🗑️ Eliminar seleccionadas</button>
+          <button type="button" class="btn-action btn-clear" id="clearAllBtnMasivo"
+            style="padding: 8px 12px; font-size: 0.85rem;">🧹 Borrar todos</button>
+        </div>
+
+        <div class="table-responsive"
+          style="max-height: 500px; overflow: auto; border: 1px solid #ccc; border-radius: 8px;">
+          <table id="dataTableMasivo" class="preview-table" spellcheck="false"
+            style="min-width: 2800px; table-layout: fixed;">
+            <thead>
+              <tr>
+                <th style="width: 200px;">RAZON SOCIAL</th>
+                <th style="width: 200px;">NOMBRE NEGOCIO</th>
+                <th style="width: 200px;">CALLE</th>
+                <th style="width: 80px;">EXT</th>
+                <th style="width: 80px;">INT</th>
+                <th style="width: 150px;">ENTRE CALLE</th>
+                <th style="width: 150px;">ENTRE CALLE2</th>
+                <th style="width: 120px;">CODIGO POSTAL</th>
+                <th style="width: 200px;">COLONIA</th>
+                <th style="width: 150px;">LATITUD</th>
+                <th style="width: 150px;">LONGITUD</th>
+                <th style="width: 150px;">SUBCANAL</th>
+                <th style="width: 150px;">GIRO COMERCIAL</th>
+                <th style="width: 200px;">CLASIFICACION INTERNA</th>
+                <th style="width: 200px;">SEGMENTACION DE MERCADO</th>
+                <th style="width: 200px;">VALIDACION</th>
+                <th style="width: 150px;">GEO-DISTANCIA</th>
+                <th style="width: 200px;">COMENTARIOS</th>
+                <th class="col-oculta">CANAL DE VENTA</th>
+                <th class="col-oculta">CEDIS ASIGNADO</th>
+                <th class="col-oculta">PLAZA DE DISTRIBUCION</th>
+                <th class="col-oculta">ZONA NIELSEN</th>
+                <th class="col-oculta">REGIONAL RESPONSABLE</th>
+                <th class="col-oculta">TIPO DE ENTREGA</th>
+                <th style="width: 120px;">ID CLIENTE</th>
+                <th style="width: 150px;">NÚMERO DE TICKET</th>
+                <th class="col-oculta">ID SUCURSAL</th>
+                <th class="col-oculta">RFC1</th>
+                <th class="col-oculta">RFC2</th>
+                <th class="col-oculta">RFC3</th>
+                <th class="col-oculta">ESTRUCTURA DE VENTAS</th>
+                <th class="col-oculta">CANAL IBP</th>
+                <th class="col-oculta">SUBCANAL IBP</th>
+                <th class="col-oculta">AGRUPADOR IBP</th>
+                <th class="col-oculta">CLIENTE IBP</th>
+                <th style="width: 50px;">✔️</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <!-- Scripts principales -->
+  <script src="mockData.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,18 @@
+{
+  "AV": "AVENIDA",
+  "BLVD": "BOULEVARD",
+  "BLV": "BOULEVARD",
+  "CDA": "CERRADA",
+  "EXT": "EXTERIOR",
+  "INT": "INTERIOR",
+  "MZA": "MZ",
+  "LTE": "LT",
+  "DEPTO": "DEPARTAMENTO",
+  "EDIF": "EDIFICIO",
+  "DEP": "DEPARTAMENTO",
+  "OF": "OFICINA",
+  "PRIV": "PRIVADA",
+  "ABTES": "ABARROTES",
+  "CLL": "CALLE",
+  "COL": "COLONIA"
+}

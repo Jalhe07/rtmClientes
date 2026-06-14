@@ -1,0 +1,513 @@
+{
+  "DETALLE": {
+    "macrocanal": "TRADICIONAL",
+    "canalIbp": "DETALLE",
+    "subcanales": [
+      "DETALLE DESARROLLADO",
+      "DETALLE PURO",
+      "DETALLE GENÉRICO"
+    ],
+    "giros": [
+      "ABARROTES",
+      "CREMERIA",
+      "MINISUPER",
+      "MISCELANEA",
+      "PANADERIA",
+      "PARTICULAR CON VENTA",
+      "OTROS GIROS",
+      "OTROS"
+    ],
+    "agrupaciones": [
+      "SIN GRUPO COMERCIAL"
+    ],
+    "agrupacionesIbp": [
+      "DETALLE"
+    ]
+  },
+  "AUTOSERVICIO": {
+    "macrocanal": "MODERNO",
+    "canalIbp": "AUTOSERVICIO",
+    "subcanales": [
+      "AUTOSERVICIO",
+      "AUTOSERVICIO GENÉRICO"
+    ],
+    "giros": [
+      "SUPERMERCADO",
+      "OTROS"
+    ],
+    "agrupaciones": [
+      "ARTELI",
+      "CASA LEY",
+      "CHEDRAUI",
+      "CITY FRESKO",
+      "GRUPO SORIANA",
+      "GRUPO WALMART",
+      "HEB",
+      "OPERADORA FUTURAMA",
+      "SMART MEXICANA",
+      "TIENDAS GRAN D",
+      "SIN GRUPO COMERCIAL"
+    ],
+    "agrupacionesIbp": [
+      "AL SUPER",
+      "ARTELI",
+      "CASA LEY",
+      "CHEDRAUI",
+      "CITY FRESKO",
+      "HEB",
+      "AUTOSERVICIOS",
+      "SMART",
+      "SORIANA",
+      "TIENDAS GRAN D",
+      "WALMART"
+    ]
+  },
+  "PROXIMIDAD": {
+    "macrocanal": "MODERNO",
+    "canalIbp": "PROXIMIDAD",
+    "subcanales": [
+      "CONVENIENCIA",
+      "FARMACIAS",
+      "HARD DISCOUNT",
+      "PROXIMIDAD GENÉRICO"
+    ],
+    "giros": [
+      "FARMACIAS",
+      "MINISUPER",
+      "OTROS"
+    ],
+    "agrupaciones": [
+      "TIENDAS GRAN D",
+      "7 ELEVEN",
+      "ASTURIANO",
+      "DOLLAR GENERAL",
+      "FARMACIAS LA GENEROSA",
+      "FARMACIAS SAN PABLO",
+      "FARMACIAS ZAMORA",
+      "FEMSA",
+      "FRAGUA",
+      "GOMART",
+      "GRUPO RFP",
+      "KIOSKO",
+      "MOBILITY ADO",
+      "SHELL",
+      "SUPER Q",
+      "TIENDAS EXTRA",
+      "TIENDAS NETO",
+      "TRES B",
+      "WALDOS",
+      "X-24",
+      "YEPAS",
+      "GRUPO VALTOCA",
+      "SIN GRUPO COMERCIAL"
+    ],
+    "agrupacionesIbp": [
+      "7 ELEVEN",
+      "DOLLAR GENERAL",
+      "FARMACIAS GUADALAJARA",
+      "NETO",
+      "FARMACIAS",
+      "CONVENIENCIA",
+      "OXXO",
+      "TRES B",
+      "WALDOS",
+      "PROXIMIDAD"
+    ]
+  },
+  "MAYOREO": {
+    "macrocanal": "TRADICIONAL",
+    "canalIbp": "MAYOREO",
+    "subcanales": [
+      "MAYOREO CORPORATIVO",
+      "MEDIO MAYOREO",
+      "MAYOREO GENÉRICO"
+    ],
+    "giros": [
+      "ABARROTERO",
+      "CREMERO",
+      "DISTRIBUIDOR",
+      "MINISUPER",
+      "OTROS GIROS",
+      "OTROS"
+    ],
+    "agrupaciones": [
+      "CASA VARGAS",
+      "COMA",
+      "COMERCIAL TREVIÑO",
+      "DECASA",
+      "DIPEPSA",
+      "DUERO",
+      "FLORIDO",
+      "FUENTES",
+      "GARIS",
+      "HM",
+      "IBARRA",
+      "LA SOLEDAD",
+      "LA VIOLETA",
+      "MAFIVAZ",
+      "MAS BODEGA",
+      "MERCO",
+      "NIETO",
+      "PCZ",
+      "PROPASA",
+      "RIVERA",
+      "SAHUAYO",
+      "SAN ANTONIO",
+      "SANCHEZ",
+      "SDM",
+      "SSFA",
+      "SUPER COMPRAS",
+      "SUPER TIENDA DEL HOGAR",
+      "SUPER TIENDAZZ",
+      "ZORRO",
+      "SIN GRUPO COMERCIAL"
+    ],
+    "agrupacionesIbp": [
+      "COMA",
+      "DECASA",
+      "DUERO",
+      "FUENTES",
+      "GARIS",
+      "GRUPO Z",
+      "H&M",
+      "IBARRA",
+      "LA VIOLETA",
+      "MAS BODEGA",
+      "MAYOREO",
+      "PROPASA",
+      "RIVERA",
+      "SAHUAYO",
+      "SAN ANTONIO",
+      "SANCHEZ",
+      "SDM",
+      "SSFA",
+      "ST DEL HOGAR",
+      "ZORRO"
+    ]
+  },
+  "FOOD SERVICE": {
+    "macrocanal": "MODERNO",
+    "canalIbp": "FOOD SERVICE",
+    "subcanales": [
+      "FS CORPORATIVO",
+      "FS TRADICIONAL",
+      "FS GENÉRICO"
+    ],
+    "giros": [
+      "CAFETERIA",
+      "COMEDOR INDUSTRIAL",
+      "COMISARIATO",
+      "DISTRIBUIDORES FOODSERVICE",
+      "ENTRETENIMIENTO Y DIVERSIÓN",
+      "ESCUELAS",
+      "EVENTOS",
+      "FOOD TRUCK",
+      "HELADERIA",
+      "HOSPITALES",
+      "HOTELES",
+      "LINEAS AEREAS",
+      "LINEAS DE AUTOBUSES",
+      "MERCADO INFORMAL",
+      "PANADERIA",
+      "RESTAURANTE",
+      "SERVICIOS DE COMEDOR",
+      "TIENDAS ESPECIALIZADAS",
+      "OTROS"
+    ],
+    "agrupaciones": [
+      "ALSEA",
+      "ARAMARK",
+      "BBVA",
+      "CAFE MADERO",
+      "CAFE VICTORIA",
+      "CARAJILLO  ",
+      "CAROLO",
+      "CHURRERIA PORFIRIO",
+      "CINEMEX",
+      "EUREST",
+      "FREXPORT",
+      "GIORNALE",
+      "GRUPO CANUTARRA",
+      "GRUPO CIE",
+      "HOSPITAL ABC",
+      "HOTSSON",
+      "IHOP",
+      "KAITEN",
+      "KEPACREPA",
+      "KRISPY KREME",
+      "LA BORRA DEL CAFE",
+      "LA ERA",
+      "LA ESPIGA",
+      "LA MARINA",
+      "LA PARROQUIA DE VERACRUZ",
+      "LA SUPERIOR",
+      "LA UNIVERSAL",
+      "LECAROZ",
+      "PALACIO DE HIERRO",
+      "PASTEKO",
+      "PROALMEX",
+      "PROLACNI",
+      "QUALYTI",
+      "RICH",
+      "SEDENA",
+      "SODEXO",
+      "TOKS",
+      "ZITRONE",
+      "CAMINO REAL",
+      "SIN GRUPO COMERCIAL"
+    ],
+    "agrupacionesIbp": [
+      "ALSEA",
+      "ARAMARK",
+      "RICH",
+      "CINEMEX",
+      "EL MORO",
+      "EUREST",
+      "LA PARROQUIA",
+      "LA UNIVERSAL ",
+      "MADERO",
+      "SODEXO",
+      "FS BAJIO",
+      "FS CENTRO",
+      "FS METRO",
+      "FS NORTE",
+      "FS PACIFICO",
+      "FS SURESTE",
+      "FOOD SERVICE"
+    ]
+  },
+  "GOBIERNO": {
+    "macrocanal": "GOBIERNO",
+    "canalIbp": "GOBIERNO",
+    "subcanales": [
+      "PROGRAMA SOCIAL",
+      "TIENDA RURAL",
+      "GOBIERNO AUTOSERVICIO",
+      "GOBIERNO GENÉRICO"
+    ],
+    "giros": [
+      "COMERCIALIZADORA",
+      "DISTRIBUIDOR",
+      "SUPERMERCADO",
+      "OTROS"
+    ],
+    "agrupaciones": [
+      "ALIUM",
+      "COMA",
+      "DICONSA",
+      "DIF",
+      "DIFEM",
+      "DON CACAHUATO",
+      "DYPASA",
+      "EL SARDINERO",
+      "FACIZOR",
+      "FRIGO NAOS",
+      "FRUITEX",
+      "GRUPO CIMARRON",
+      "GRUPO PELMU",
+      "IMSS",
+      "INSTITUTO DE LA MUJER",
+      "ISSSTE",
+      "LA ITALIANA",
+      "LICONSA",
+      "NUTRAS",
+      "PAGUSA",
+      "PASSAT",
+      "PRODEA",
+      "UNAM",
+      "SIN GRUPO COMERCIAL"
+    ],
+    "agrupacionesIbp": [
+      "DICONSA",
+      "DIF",
+      "GOBIERNO AUTOSERVICIOS",
+      "GOBIERNO"
+    ]
+  },
+  "DISTRIBUIDORES": {
+    "macrocanal": "TRADICIONAL",
+    "canalIbp": "DISTRIBUIDORES",
+    "subcanales": [
+      "DISTRIBUIDORES",
+      "DISTRIBUIDORES GENÉRICO"
+    ],
+    "giros": [
+      "DISTRIBUIDOR",
+      "OTROS"
+    ],
+    "agrupaciones": [
+      "SIN GRUPO COMERCIAL"
+    ],
+    "agrupacionesIbp": [
+      "ARMIDA",
+      "CRODA",
+      "LACDESUR",
+      "REPRESENTACIONES MORALES",
+      "SAMOROSU",
+      "DISTRIBUIDORES"
+    ]
+  },
+  "CLUB DE PRECIOS": {
+    "macrocanal": "MODERNO",
+    "canalIbp": "CLUB DE PRECIOS",
+    "subcanales": "CLUB DE PRECIOS",
+    "giros": [
+      "CASH AND CARRY",
+      "OTROS"
+    ],
+    "agrupaciones": [
+      "COSTCO",
+      "GRUPO SORIANA",
+      "GRUPO WALMART",
+      "SIN GRUPO COMERCIAL"
+    ],
+    "agrupacionesIbp": [
+      "CITY CLUB",
+      "COSTCO DE MEXICO",
+      "SAM’S CLUB"
+    ]
+  },
+  "E-COMMERCE": {
+    "macrocanal": "MODERNO",
+    "canalIbp": "E-COMMERCE",
+    "subcanales": [
+      "PURE PLAYERS",
+      "QUICK COMMERCE",
+      "B2B"
+    ],
+    "giros": [
+      "COMERCIO ELECTRÓNICO",
+      "OTROS"
+    ],
+    "agrupaciones": [
+      "AMAZON",
+      "CALII MARKET",
+      "CHIPERINC",
+      "FRUBANA",
+      "JOKR MEXICO",
+      "MERCADO LIBRE",
+      "PODER JUSTO",
+      "RABBIT",
+      "RAPPI TURBO",
+      "SIN GRUPO COMERCIAL"
+    ],
+    "agrupacionesIbp": [
+      "AMAZON MEXICO",
+      "CALLI MARKET",
+      "CHIPERINC",
+      "FRUBANA",
+      "JOKR MEXICO",
+      "MERCADO LIBRE",
+      "PODER JUSTO",
+      "RABBIT",
+      "RAPPI TURBO"
+    ]
+  },
+  "MARCA PROPIA": {
+    "macrocanal": "MARCA PROPIA",
+    "canalIbp": "MARCA PROPIA",
+    "subcanales": [
+      "MARCA PROPIA AUTOSERVICIOS",
+      "MARCA PROPIA CLUB DE PRECIOS",
+      "MARCA PROPIA HARD DISCOUNT"
+    ],
+    "giros": [
+      "MINISUPER",
+      "SUPERMERCADO",
+      "OTROS"
+    ],
+    "agrupaciones": [
+      "GRUPO WALMART",
+      "HEB",
+      "TIENDAS NETO",
+      "SIN GRUPO COMERCIAL"
+    ],
+    "agrupacionesIbp": [
+      "HEB MAQUILA",
+      "NETO MARCA PROPIA",
+      "SAMS CLUB MEMBERS MARK",
+      "WALMART GREAT VALUE"
+    ]
+  },
+  "GEPP": {
+    "macrocanal": "TRADICIONAL",
+    "canalIbp": "GEPP",
+    "subcanales": [
+      "GEPP DETALLE",
+      "GEPP HOGAR"
+    ],
+    "giros": [
+      "DISTRIBUIDOR",
+      "OTROS"
+    ],
+    "agrupaciones": "GEPP",
+    "agrupacionesIbp": [
+      "GEPP CENTRO",
+      "GEPP METRO",
+      "GEPP NORTE",
+      "GEPP OCCIDENTE",
+      "GEPP PACIFICO",
+      "GEPP SUR"
+    ]
+  },
+  "B2B": {
+    "macrocanal": "B2B",
+    "canalIbp": "B2B",
+    "subcanales": "B2B",
+    "giros": [
+      "COMERCIALIZADORA",
+      "INDUSTRIA",
+      "MAQUILADORA",
+      "OTROS"
+    ],
+    "agrupaciones": "SIN GRUPO COMERCIAL",
+    "agrupacionesIbp": "B2B"
+  },
+  "TIENDAS": {
+    "macrocanal": "TRADICIONAL",
+    "canalIbp": "TIENDAS",
+    "subcanales": [
+      "LECHERIA ALPURA",
+      "TIENDAS DELICIAS",
+      "TIENDAS GENERICO"
+    ],
+    "giros": [
+      "ABARROTES",
+      "TIENDAS",
+      "OTROS"
+    ],
+    "agrupaciones": "SIN GRUPO COMERCIAL",
+    "agrupacionesIbp": "TIENDAS"
+  },
+  "EXPORTACION": {
+    "macrocanal": "EXPORTACION",
+    "canalIbp": "EXPORTACION",
+    "subcanales": "EXPORTACION",
+    "giros": [
+      "COMERCIALIZADORA",
+      "DISTRIBUIDOR",
+      "OTROS"
+    ],
+    "agrupaciones": "SIN GRUPO COMERCIAL",
+    "agrupacionesIbp": "EXPORTACION"
+  },
+  "OTROS": {
+    "macrocanal": "OTROS",
+    "canalIbp": "OTROS",
+    "subcanales": [
+      "ALIANZA",
+      "ALMACENES",
+      "ANDEN",
+      "DONACION",
+      "EMPLEADOS",
+      "FILIALES",
+      "OTROS INGRESOS",
+      "SEMEN Y EMBRIONES",
+      "SOCIOS",
+      "TRANSPORTISTAS"
+    ],
+    "giros": "OTROS",
+    "agrupaciones": "SIN GRUPO COMERCIAL",
+    "agrupacionesIbp": "OTROS"
+  }
+}
