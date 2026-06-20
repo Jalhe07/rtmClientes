@@ -1363,56 +1363,104 @@
     "plazas": "904 - NAVE 13 SECOS",
     "rutas": "90001",
     "tipoEntrega": "MACROCEDIS",
-    "regionalResponsable": "REGION VI - SURESTE",
+    "regionalResponsable": [
+      "B2B",
+      "CUENTAS KAM",
+      "EXPORTACION",
+      "GOBIERNO",
+      "NO APLICA"
+    ],
     "zonaNielsen": "NO APLICA"
   },
   "NAVE 13 DERIVADOS": {
     "plazas": "905 - NAVE 13 DERIVADOS",
     "rutas": "90001",
     "tipoEntrega": "MACROCEDIS",
-    "regionalResponsable": "EXPORTACIÓN",
+    "regionalResponsable": [
+      "B2B",
+      "CUENTAS KAM",
+      "EXPORTACION",
+      "GOBIERNO",
+      "NO APLICA"
+    ],
     "zonaNielsen": "REGION I - PACIFICO"
   },
   "NAVE 14 SECOS": {
     "plazas": "906 - NAVE 14 SECOS",
     "rutas": "90001",
     "tipoEntrega": "MACROCEDIS",
-    "regionalResponsable": "REGION II - NORESTE",
+    "regionalResponsable": [
+      "B2B",
+      "CUENTAS KAM",
+      "EXPORTACION",
+      "GOBIERNO",
+      "NO APLICA"
+    ],
     "zonaNielsen": "REGION II - NORESTE"
   },
   "DELICIAS SECOS": {
     "plazas": "907 - DELICIAS SECOS",
     "rutas": "99999",
     "tipoEntrega": "MACROCEDIS",
-    "regionalResponsable": "GOBIERNO",
+    "regionalResponsable": [
+      "B2B",
+      "CUENTAS KAM",
+      "EXPORTACION",
+      "GOBIERNO",
+      "NO APLICA"
+    ],
     "zonaNielsen": "REGION III - BAJIO"
   },
   "PLANTA INLEDESA": {
     "plazas": "441 - PLANTA INLEDESA",
     "rutas": "99999",
     "tipoEntrega": "MACROCEDIS",
-    "regionalResponsable": "CUENTAS KAM",
+    "regionalResponsable": [
+      "B2B",
+      "CUENTAS KAM",
+      "EXPORTACION",
+      "GOBIERNO",
+      "NO APLICA"
+    ],
     "zonaNielsen": "REGION IV - CENTRO"
   },
   "PLANTA CARRANCO": {
     "plazas": "442 - PLANTA CARRANCO",
     "rutas": "99999",
     "tipoEntrega": "MACROCEDIS",
-    "regionalResponsable": "NO APLICA",
+    "regionalResponsable": [
+      "B2B",
+      "CUENTAS KAM",
+      "EXPORTACION",
+      "GOBIERNO",
+      "NO APLICA"
+    ],
     "zonaNielsen": "REGION V - VDM"
   },
   "ACCEL CAMARONES": {
     "plazas": "909 - ACCEL CAMARONES",
     "rutas": "99999",
     "tipoEntrega": "MACROCEDIS",
-    "regionalResponsable": "REGION I - PACIFICO",
+    "regionalResponsable": [
+      "B2B",
+      "CUENTAS KAM",
+      "EXPORTACION",
+      "GOBIERNO",
+      "NO APLICA"
+    ],
     "zonaNielsen": "REGION VI - SURESTE"
   },
   "ACCEL CUAUTITLAN": {
     "plazas": "909 - ACCEL CUAUTITLAN",
     "rutas": "99999",
     "tipoEntrega": "MACROCEDIS",
-    "regionalResponsable": "REGION II - NORESTE",
+    "regionalResponsable": [
+      "B2B",
+      "CUENTAS KAM",
+      "EXPORTACION",
+      "GOBIERNO",
+      "NO APLICA"
+    ],
     "zonaNielsen": "NO APLICA"
   },
   "ANDEN PLANTA": {
@@ -1423,35 +1471,37 @@
     ],
     "rutas": "99999",
     "tipoEntrega": "NO APLICA",
-    "regionalResponsable": "NO APLICA",
     "zonaNielsen": "NO APLICA"
   },
   "DISTRIBUIDORES": {
     "plazas": [
-      "143 - APATZINGAN III",
-      "270 - APATZINGAN IV",
-      "271 - APATZINGAN V",
       "6 - CD. ALTAMIRANO",
-      "14 - COATZACOALCOS",
-      "247 - COMITAN",
-      "15 - CORDOBA",
-      "21 - HUAJUAPAN DE LEON",
       "13 - IGUALA",
-      "180 - LA PIEDAD",
-      "174 - MARAVATIO SUC 1",
-      "245 - MARAVATIO SUC 2",
-      "167 - OAXACA",
-      "269 - PETATLAN",
-      "122 - PINOTEPA NACIONAL",
-      "240 - POLOTITLAN",
+      "14 - COATZACOALCOS",
+      "15 - CORDOBA ",
+      "21 - HUAJUAPAN DE LEON",
       "38 - PUERTO ESCONDIDO",
       "40 - SALINA CRUZ",
       "46 - TEHUACAN",
-      "186 - TEZIUTLAN",
-      "70 - TLAXCO",
       "49 - TLAXCOAPAN",
+      "54 - TUXTEPEC",
+      "70 - TLAXCO",
+      "240 - POLOTITLAN",
+      "122 - PINOTEPA NACIONAL",
+      "143 - APATZINGAN III",
+      "167 - OAXACA",
+      "174 - MARAVATIO SUC 1",
+      "180 - LA PIEDAD",
+      "186 - TEZIUTLAN",
       "227 - TULANCINGO",
-      "54 - TUXTEPEC"
+      "245 - MARAVATIO SUC 2",
+      "247 - COMITAN",
+      "269 - PETATLAN",
+      "270 - APATZINGAN IV",
+      "271 - APATZINGAN V",
+      "276 - IGUALA II",
+      "279 - TEJUPILCO II",
+      "280 - LA PIEDAD VITERE"
     ],
     "rutas": "99999",
     "tipoEntrega": "DISTRIBUIDORES",

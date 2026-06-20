@@ -86,6 +86,43 @@
             <p>Solicitudes por lote de clientes canal DETALLE con validación geográfica y comercial.</p>
             <span class="card-action-text">Cargar datos &rarr;</span>
           </div>
+
+          <!-- Tarjeta Cambio a Factura Individual -->
+          <div class="menu-card menu-card-half" id="btn-to-cambio-factura">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24">
+                <path
+                  d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"
+                  fill="#084475" />
+              </svg>
+            </div>
+            <h3>Cambio a Factura Individual</h3>
+            <span class="card-action-text">Iniciar Solicitud &rarr;</span>
+          </div>
+
+          <!-- Tarjeta Cambio de Canal -->
+          <div class="menu-card menu-card-half" id="btn-to-cambio-canal">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24">
+                <path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 6h4v8H4v-8zm16 8h-4v-6h4v6z" fill="#084475" />
+              </svg>
+            </div>
+            <h3>Cambio de Canal</h3>
+            <span class="card-action-text">Iniciar Solicitud &rarr;</span>
+          </div>
+
+          <!-- Tarjeta Reactivación de Clientes -->
+          <div class="menu-card menu-card-half" id="btn-to-reactivacion">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24">
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"
+                  fill="#084475" />
+              </svg>
+            </div>
+            <h3>Reactivación de Clientes</h3>
+            <span class="card-action-text">Iniciar Solicitud &rarr;</span>
+          </div>
         </div>
       </main>
 
@@ -287,8 +324,8 @@
               <!-- Envío de Facturas -->
               <tr>
                 <td><strong>ENVÍO DE FACTURAS:</strong> <span class="lbl-factura-req"
-                    style="display:none; color:var(--accent-color); font-size:10px;">* (Requerido para
-                    INDIVIDUAL)</span></td>
+                    style="display:none; color:var(--accent-color); font-size:10px;">* (Obligatorio para envío de
+                    facturas)</span></td>
                 <td class="field-group-inline">
                   <input type="text" id="fac-nombre" placeholder="NOMBRE COMPLETO">
                 </td>
@@ -917,9 +954,351 @@
   </div>
 
 
+  <!-- ================= VISTA: CAMBIO A FACTURA INDIVIDUAL ================= -->
+  <div id="cambio-factura-view" class="view">
+    <div class="form-container">
+      <header class="form-header">
+        <button class="btn-back" id="btn-back-factura">
+          <svg viewBox="0 0 24 24" width="18" height="18">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor" />
+          </svg>
+          Volver a Inicio
+        </button>
+        <div class="form-header-logos">
+          <h2>Cambio a Factura Individual</h2>
+          <span class="badge">RTM - Road to Market</span>
+        </div>
+      </header>
+      <form id="cambio-factura-form" novalidate>
+        <!-- SECCIÓN 1: IDENTIFICACIÓN -->
+        <div class="form-section">
+          <h3 class="section-title">1. Datos de Identificación</h3>
+          <div class="grid-container">
+            <div class="col-4 field-group">
+              <label for="cf-num-cliente">* NÚM. CLIENTE:</label>
+              <input type="text" id="cf-num-cliente" required placeholder="5 o 6 DÍGITOS">
+              <span class="error-msg">Debe ser de 5 o 6 dígitos numéricos.</span>
+            </div>
+            <div class="col-8 field-group">
+              <label for="cf-razon-social">* RAZÓN SOCIAL:</label>
+              <input type="text" id="cf-razon-social" required placeholder="RAZÓN SOCIAL COMPLETA">
+              <span class="error-msg">Este campo es requerido (solo letras, números y Ñ).</span>
+            </div>
+          </div>
+        </div>
 
+        <!-- SECCIÓN 2: DATOS FISCALES Y CONTACTOS -->
+        <div class="form-section section-fiscal bg-fiscal-light">
+          <h3 class="section-title text-fiscal">2. Datos de pago y facturación</h3>
+          <div class="grid-container">
+            <div class="col-3 field-group">
+              <label for="cf-forma-pago">* FORMA DE PAGO:</label>
+              <select id="cf-forma-pago">
+                <option value="">Seleccione...</option>
+              </select>
+            </div>
+            <div class="col-3 field-group bg-fiscal">
+              <label for="cf-rfc">* RFC:</label>
+              <input type="text" id="cf-rfc" maxlength="13" placeholder="3-4 Letras + 6 Números + Homoclave">
+              <span class="error-msg">Formato de RFC incorrecto.</span>
+            </div>
+            <div class="col-3 field-group bg-fiscal">
+              <label for="cf-regimen-fiscal">* RÉGIMEN FISCAL:</label>
+              <select id="cf-regimen-fiscal">
+                <option value="">Seleccione...</option>
+              </select>
+            </div>
+            <div class="col-3 field-group bg-fiscal">
+              <label for="cf-uso-cfdi">* USO DE CFDI:</label>
+              <select id="cf-uso-cfdi">
+                <option value="">Seleccione Régimen primero...</option>
+              </select>
+            </div>
 
-  <!-- Scripts principales -->
+            <div class="col-12" style="margin-top: 15px;">
+              <label style="font-size: 0.8rem; font-weight: 700; color: var(--primary-color);">CONTACTOS PARA ENVÍO DE
+                FACTURAS</label>
+              <table class="contacts-table">
+                <thead>
+                  <tr>
+                    <th style="width: 40%;">* Nombre Completo</th>
+                    <th style="width: 35%;">* eMAIL</th>
+                    <th style="width: 25%;">Teléfono</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="field-group-inline"><input type="text" id="cf-fac-nombre" placeholder="NOMBRE"></td>
+                    <td class="field-group-inline"><input type="email" id="cf-fac-email" required
+                        placeholder="email@dominio.com"></td>
+                    <td class="field-group-inline"><input type="text" id="cf-fac-telefono" maxlength="10"
+                        placeholder="10 DÍGITOS"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 3: DATOS DEL SOLICITANTE -->
+        <div class="form-section">
+          <h3 class="section-title">3. Datos del Solicitante</h3>
+          <div class="grid-container">
+            <div class="col-3 field-group bg-disabled">
+              <label for="cf-fecha">FECHA DE SOLICITUD:</label>
+              <input type="text" id="cf-fecha" readonly class="locked">
+            </div>
+            <div class="col-9 field-group">
+              <label for="cf-solicitante">* NOMBRE DEL SOLICITANTE:</label>
+              <input type="text" id="cf-solicitante" required placeholder="NOMBRE COMPLETO DEL SOLICITANTE">
+              <span class="error-msg">Este campo es requerido.</span>
+            </div>
+            <div class="col-12 field-group">
+              <label for="cf-comentarios">COMENTARIOS / MOTIVO DEL CAMBIO:</label>
+              <textarea id="cf-comentarios" rows="3" maxlength="500" placeholder="Escriba los comentarios o motivo del cambio (máximo 500 caracteres)..." oninput="document.getElementById('cf-comentarios-counter').innerText = this.value.length + '/500';"></textarea>
+              <div id="cf-comentarios-counter" class="char-counter">0/500</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-actions-bar">
+          <button type="button" class="btn-action btn-menu" id="btn-menu-factura">Volver a Inicio</button>
+          <button type="button" class="btn-action btn-clear" id="btn-clear-factura">Limpiar Formulario</button>
+          <button type="submit" class="btn-action btn-generate">Descargar Requerimiento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= VISTA: CAMBIO DE CANAL ================= -->
+  <div id="cambio-canal-view" class="view">
+    <div class="form-container">
+      <header class="form-header">
+        <button class="btn-back" id="btn-back-canal">
+          <svg viewBox="0 0 24 24" width="18" height="18">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor" />
+          </svg>
+          Volver a Inicio
+        </button>
+        <div class="form-header-logos">
+          <h2>Cambio de Canal</h2>
+          <span class="badge">RTM - Road to Market</span>
+        </div>
+      </header>
+      <form id="cambio-canal-form" novalidate>
+        <div class="form-section">
+          <h3 class="section-title">1. Datos de Identificación</h3>
+          <div class="grid-container">
+            <div class="col-4 field-group">
+              <label for="cc-num-cliente">* NÚM. CLIENTE:</label>
+              <input type="text" id="cc-num-cliente" required placeholder="5 o 6 DÍGITOS">
+            </div>
+            <div class="col-8 field-group">
+              <label for="cc-razon-social">* RAZÓN SOCIAL:</label>
+              <input type="text" id="cc-razon-social" required placeholder="RAZÓN SOCIAL COMPLETA">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">2. Estructura Comercial</h3>
+          <div class="grid-container">
+            <div class="col-12 field-group bg-light" style="margin-bottom: 10px;">
+              <label for="cc-canal-actual">* CANAL DE VENTA ACTUAL:</label>
+              <select id="cc-canal-actual" required>
+                <option value="">Seleccione...</option>
+              </select>
+            </div>
+
+            <div class="col-12" style="margin-top: 10px; margin-bottom: 5px;">
+              <span style="font-size: 0.9rem; font-weight: 700; color: var(--primary-color);">NUEVA ASIGNACIÓN:</span>
+            </div>
+
+            <div class="col-4 field-group bg-disabled">
+              <label for="cc-macrocanal">MACROCANAL:</label>
+              <input type="text" id="cc-macrocanal" readonly class="locked">
+            </div>
+            <div class="col-4 field-group">
+              <label for="cc-canal-nuevo">* CANAL DE VENTA:</label>
+              <select id="cc-canal-nuevo" required>
+                <option value="">Seleccione...</option>
+              </select>
+            </div>
+            <div class="col-4 field-group">
+              <label for="cc-subcanal">* SUBCANAL:</label>
+              <select id="cc-subcanal" required>
+                <option value="">Seleccione Canal primero...</option>
+              </select>
+            </div>
+            <div class="col-4 field-group">
+              <label for="cc-giro">* GIRO:</label>
+              <select id="cc-giro" required>
+                <option value="">Seleccione Canal primero...</option>
+              </select>
+            </div>
+            <div class="col-4 field-group">
+              <label for="cc-agrupacion">* AGRUPACIÓN CLIENTES:</label>
+              <select id="cc-agrupacion" required>
+                <option value="">Seleccione Canal primero...</option>
+              </select>
+            </div>
+            <div class="col-6 field-group bg-disabled">
+              <label for="cc-canal-ibp">CANAL DE VENTA IBP:</label>
+              <input type="text" id="cc-canal-ibp" readonly class="locked">
+            </div>
+            <div class="col-6 field-group">
+              <label for="cc-agrupacion-ibp">* AGRUPACIÓN IBP:</label>
+              <select id="cc-agrupacion-ibp" required>
+                <option value="">Seleccione Canal primero...</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 3: DATOS DEL SOLICITANTE -->
+        <div class="form-section">
+          <h3 class="section-title">3. Datos del Solicitante</h3>
+          <div class="grid-container">
+            <div class="col-3 field-group bg-disabled">
+              <label for="cc-fecha">FECHA DE SOLICITUD:</label>
+              <input type="text" id="cc-fecha" readonly class="locked">
+            </div>
+            <div class="col-9 field-group">
+              <label for="cc-solicitante">* NOMBRE DEL SOLICITANTE:</label>
+              <input type="text" id="cc-solicitante" required placeholder="NOMBRE COMPLETO DEL SOLICITANTE">
+              <span class="error-msg">Este campo es requerido.</span>
+            </div>
+            <div class="col-12 field-group">
+              <label for="cc-comentarios">COMENTARIOS / MOTIVO DEL CAMBIO:</label>
+              <textarea id="cc-comentarios" rows="3" maxlength="500" placeholder="Escriba los comentarios o motivo del cambio (máximo 500 caracteres)..." oninput="document.getElementById('cc-comentarios-counter').innerText = this.value.length + '/500';"></textarea>
+              <div id="cc-comentarios-counter" class="char-counter">0/500</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-actions-bar">
+          <button type="button" class="btn-action btn-menu" id="btn-menu-canal">Volver a Inicio</button>
+          <button type="button" class="btn-action btn-clear" id="btn-clear-canal">Limpiar Formulario</button>
+          <button type="submit" class="btn-action btn-generate">Descargar Requerimiento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= VISTA: REACTIVACIÓN DE CLIENTES ================= -->
+  <div id="reactivacion-view" class="view">
+    <div class="form-container">
+      <header class="form-header">
+        <button class="btn-back" id="btn-back-react">
+          <svg viewBox="0 0 24 24" width="18" height="18">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor" />
+          </svg>
+          Volver a Inicio
+        </button>
+        <div class="form-header-logos">
+          <h2>Reactivación de Clientes</h2>
+          <span class="badge">RTM - Road to Market</span>
+        </div>
+      </header>
+      <form id="reactivacion-form" novalidate>
+        <div class="form-section">
+          <div class="grid-container">
+            <div class="col-4 field-group">
+              <label for="rc-cedis-global">* SELECCIONE CEDIS:</label>
+              <select id="rc-cedis-global" required>
+                <option value="">Seleccione CEDIS...</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-title">Clientes a Reactivar</h3>
+          <div class="table-responsive">
+            <!-- Esta tabla será desplazable horizontalmente -->
+            <table class="preview-table" id="reactivacion-table" style="min-width: 2500px;">
+              <thead>
+                <tr>
+                  <th style="width: 120px;">* NÚM. CLIENTE</th>
+                  <th style="width: 120px;">* NÚM. SUCURSAL</th>
+                  <th style="width: 200px;">* NOMBRE O RAZÓN SOCIAL</th>
+                  <th style="width: 200px;">NOMBRE COMERCIAL</th>
+                  <th style="width: 150px;">* CALLE</th>
+                  <th style="width: 80px;">* NÚMERO</th>
+                  <th style="width: 150px;">ENTRE CALLE</th>
+                  <th style="width: 150px;">Y CALLE</th>
+                  <th style="width: 100px;">* CÓDIGO POSTAL</th>
+                  <th style="width: 150px;">* COLONIA</th>
+                  <th style="width: 120px;">* LATITUD</th>
+                  <th style="width: 120px;">* LONGITUD</th>
+                  <th style="width: 150px;">* CEDIS ASIGNADO</th>
+                  <th style="width: 150px;">* PLAZA DIST.</th>
+                  <th style="width: 120px;">RUTA</th>
+                  <th style="width: 150px;">DÍAS VISITA</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr id="rc-input-row">
+                  <td class="field-group-inline"><input type="text" name="rc-num-cliente" required
+                      placeholder="5-6 díg"></td>
+                  <td class="field-group-inline"><input type="text" name="rc-num-sucursal" required
+                      placeholder="1-3 díg" maxlength="3"></td>
+                  <td class="field-group-inline"><input type="text" name="rc-razon"></td>
+                  <td class="field-group-inline"><input type="text" name="rc-comercial"></td>
+                  <td class="field-group-inline"><input type="text" name="rc-calle"></td>
+                  <td class="field-group-inline"><input type="text" name="rc-numero"></td>
+                  <td class="field-group-inline"><input type="text" name="rc-entre"></td>
+                  <td class="field-group-inline"><input type="text" name="rc-ycalle"></td>
+                  <td class="field-group-inline"><input type="text" name="rc-cp" maxlength="5"></td>
+                  <td class="field-group-inline"><select name="rc-colonia"
+                      style="width: 100%; border:1px solid #ccc; border-radius:4px;">
+                      <option value=""></option>
+                    </select></td>
+                  <td class="field-group-inline"><input type="text" name="rc-lat" placeholder="##.000000"></td>
+                  <td class="field-group-inline"><input type="text" name="rc-lon" placeholder="-##.000000"></td>
+                  <td class="field-group-inline"><input type="text" name="rc-cedis" readonly class="locked"></td>
+                  <td class="field-group-inline"><select name="rc-plaza"
+                      style="width: 100%; border:1px solid #ccc; border-radius:4px;">
+                      <option value=""></option>
+                    </select></td>
+                  <td class="field-group-inline"><select name="rc-ruta"
+                      style="width: 100%; border:1px solid #ccc; border-radius:4px;">
+                      <option value=""></option>
+                    </select></td>
+                  <td class="field-group-inline">
+                    <div class="visita-checkboxes" style="min-width: 200px; padding: 2px;">
+                      <label class="chk-item"><input type="checkbox" name="rc-visita" value="L"><span
+                          style="padding: 2px 6px;">L</span></label>
+                      <label class="chk-item"><input type="checkbox" name="rc-visita" value="M"><span
+                          style="padding: 2px 6px;">M</span></label>
+                      <label class="chk-item"><input type="checkbox" name="rc-visita" value="MR"><span
+                          style="padding: 2px 6px;">MR</span></label>
+                      <label class="chk-item"><input type="checkbox" name="rc-visita" value="J"><span
+                          style="padding: 2px 6px;">J</span></label>
+                      <label class="chk-item"><input type="checkbox" name="rc-visita" value="V"><span
+                          style="padding: 2px 6px;">V</span></label>
+                      <label class="chk-item"><input type="checkbox" name="rc-visita" value="S"><span
+                          style="padding: 2px 6px;">S</span></label>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+              <tbody id="reactivacion-records">
+                <!-- Registros agregados irán aquí -->
+              </tbody>
+            </table>
+          </div>
+          <div style="margin-top: 15px; text-align: right;">
+            <button type="button" class="btn-action" id="btn-add-reactivacion-record"
+              style="background-color: var(--accent-color); color: #fff;">Agregar Registro</button>
+          </div>
+        </div>
+        <div class="form-actions-bar">
+          <button type="button" class="btn-action btn-menu" id="btn-menu-react">Volver a Inicio</button>
+          <button type="button" class="btn-action btn-clear" id="btn-clear-react">Limpiar Formulario</button>
+          <button type="submit" class="btn-action btn-generate">Descargar requerimiento</button>
+        </div>
+      </form>
+    </div>
+  </div>
   <script src="mockData.js"></script>
   <script src="app.js"></script>
 </body>

@@ -6,16 +6,19 @@ document.addEventListener("alpuraDataLoaded", () => {
     home: document.getElementById("home-view"),
     individual: document.getElementById("individual-view"),
     sucursal: document.getElementById("sucursal-view"),
-    masivo: document.getElementById("masivo-view")
+    masivo: document.getElementById("masivo-view"),
+    cambioFactura: document.getElementById("cambio-factura-view"),
+    cambioCanal: document.getElementById("cambio-canal-view"),
+    reactivacion: document.getElementById("reactivacion-view")
   };
 
   // --- NAVEGACIÓN ---
   function switchView(viewName) {
     Object.keys(views).forEach(key => {
       if (key === viewName) {
-        views[key].classList.add("active");
+        if(views[key]) views[key].classList.add("active");
       } else {
-        views[key].classList.remove("active");
+        if(views[key]) views[key].classList.remove("active");
       }
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -25,6 +28,9 @@ document.addEventListener("alpuraDataLoaded", () => {
   document.getElementById("btn-to-individual").addEventListener("click", () => switchView("individual"));
   document.getElementById("btn-to-sucursal").addEventListener("click", () => switchView("sucursal"));
   document.getElementById("btn-to-masivo").addEventListener("click", () => switchView("masivo"));
+  if (document.getElementById("btn-to-cambio-factura")) document.getElementById("btn-to-cambio-factura").addEventListener("click", () => switchView("cambioFactura"));
+  if (document.getElementById("btn-to-cambio-canal")) document.getElementById("btn-to-cambio-canal").addEventListener("click", () => switchView("cambioCanal"));
+  if (document.getElementById("btn-to-reactivacion")) document.getElementById("btn-to-reactivacion").addEventListener("click", () => switchView("reactivacion"));
 
   // Eventos de botones de regreso
   document.getElementById("btn-back-1").addEventListener("click", () => {
@@ -93,6 +99,13 @@ document.addEventListener("alpuraDataLoaded", () => {
 
   // Inicializar Régimen Fiscal completo
   initSelect("regimen-fiscal", Object.keys(data.regimenesFiscales));
+
+  // Inicializar selectores de nuevas vistas
+  if (document.getElementById("cf-forma-pago")) initSelect("cf-forma-pago", data.formasPago);
+  if (document.getElementById("cf-regimen-fiscal")) initSelect("cf-regimen-fiscal", Object.keys(data.regimenesFiscales));
+  if (document.getElementById("cc-canal-actual")) initSelect("cc-canal-actual", Object.keys(data.canalesVenta));
+  if (document.getElementById("cc-canal-nuevo")) initSelect("cc-canal-nuevo", Object.keys(data.canalesVenta));
+  if (document.getElementById("rc-cedis-global")) initSelect("rc-cedis-global", Object.keys(data.cedis));
 
   // --- MULTISELECCIÓN DE DÍAS DE PAGO ---
   const diasPagoTrigger = document.getElementById("dias-pago-trigger");
@@ -207,7 +220,7 @@ document.addEventListener("alpuraDataLoaded", () => {
   };
 
   // Escuchar inputs para forzar mayúsculas/minúsculas y caracteres permitidos
-  const inputs = document.querySelectorAll("#individual-client-form input, #individual-client-form textarea");
+  const inputs = document.querySelectorAll("#individual-client-form input, #individual-client-form textarea, #cambio-factura-form input, #cambio-canal-form input, #reactivacion-form input");
 
   inputs.forEach(input => {
     if (input.id === "fecha") return; // Ignorar campo de fecha autogenerado
@@ -225,13 +238,13 @@ document.addEventListener("alpuraDataLoaded", () => {
         // En cualquier otro input, todo a Mayúsculas
         val = val.toUpperCase();
 
-        if (input.id === "numero") {
+        if (input.id === "numero" || input.name === "rc-numero") {
           // Campo NÚMERO: Permite Ñ, números, letras y la barra diagonal "/" (para S/N)
           val = val.replace(/[^A-Z0-9 Ñ\/]/g, "");
-        } else if (input.id === "latitud" || input.id === "longitud") {
+        } else if (input.id === "latitud" || input.id === "longitud" || input.name === "rc-lat" || input.name === "rc-lon") {
           // Latitud y Longitud: Solo números, punto y signo menos
           val = val.replace(/[^0-9.\-]/g, "");
-        } else if (input.id === "codigo-postal" || input.id === "rep-telefono" || input.id === "fac-telefono" || input.id === "com-telefono" || input.id === "limite-credito") {
+        } else if (input.id === "codigo-postal" || input.id === "rep-telefono" || input.id === "fac-telefono" || input.id === "com-telefono" || input.id === "cf-fac-telefono" || input.name === "rc-cp" || input.id === "limite-credito") {
           // Teléfonos, CP y Límite de Crédito: Solo números y punto
           if (input.id === "limite-credito") {
             val = val.replace(/[^0-9.]/g, "");
@@ -522,6 +535,69 @@ document.addEventListener("alpuraDataLoaded", () => {
     });
   }
 
+  // Lógica para Cambio de Canal
+  const ccCanalNuevoSelect = document.getElementById("cc-canal-nuevo");
+  function updateComercialFieldsCambioCanal(canalVal) {
+    const macroInput = document.getElementById("cc-macrocanal");
+    const canalIbpInput = document.getElementById("cc-canal-ibp");
+    const giroSelect = document.getElementById("cc-giro");
+    const agrupacionSelect = document.getElementById("cc-agrupacion");
+    const subcanalSelect = document.getElementById("cc-subcanal");
+    const agrupacionIbpSelect = document.getElementById("cc-agrupacion-ibp");
+
+    macroInput.value = "";
+    canalIbpInput.value = "";
+    if (giroSelect) giroSelect.innerHTML = '<option value="">Seleccione Canal primero...</option>';
+    if (agrupacionSelect) agrupacionSelect.innerHTML = '<option value="">Seleccione Canal primero...</option>';
+    if (subcanalSelect) subcanalSelect.innerHTML = '<option value="">Seleccione Canal primero...</option>';
+    if (agrupacionIbpSelect) agrupacionIbpSelect.innerHTML = '<option value="">Seleccione Canal primero...</option>';
+
+    if (canalVal && data.canalesVenta && data.canalesVenta[canalVal]) {
+      const channelData = data.canalesVenta[canalVal];
+
+      macroInput.value = channelData.macrocanal || "";
+      canalIbpInput.value = channelData.canalIbp || "";
+
+      const girosList = Array.isArray(channelData.giros) ? channelData.giros : (channelData.giros ? [channelData.giros] : []);
+      if (giroSelect && girosList.length > 0) {
+        giroSelect.innerHTML = '<option value="">Seleccione...</option>';
+        girosList.forEach(item => {
+          const opt = document.createElement("option"); opt.value = item; opt.textContent = item; giroSelect.appendChild(opt);
+        });
+      }
+
+      const agrupacionesList = Array.isArray(channelData.agrupaciones) ? channelData.agrupaciones : (channelData.agrupaciones ? [channelData.agrupaciones] : []);
+      if (agrupacionSelect && agrupacionesList.length > 0) {
+        agrupacionSelect.innerHTML = '<option value="">Seleccione...</option>';
+        agrupacionesList.forEach(item => {
+          const opt = document.createElement("option"); opt.value = item; opt.textContent = item; agrupacionSelect.appendChild(opt);
+        });
+      }
+
+      const subcanalesList = Array.isArray(channelData.subcanales) ? channelData.subcanales : (channelData.subcanales ? [channelData.subcanales] : (Array.isArray(channelData.gruposComerciales) ? channelData.gruposComerciales : []));
+      if (subcanalSelect && subcanalesList.length > 0) {
+        subcanalSelect.innerHTML = '<option value="">Seleccione...</option>';
+        subcanalesList.forEach(item => {
+          const opt = document.createElement("option"); opt.value = item; opt.textContent = item; subcanalSelect.appendChild(opt);
+        });
+      }
+
+      const agrupacionesIbpList = Array.isArray(channelData.agrupacionesIbp) ? channelData.agrupacionesIbp : (channelData.agrupacionesIbp ? [channelData.agrupacionesIbp] : []);
+      if (agrupacionIbpSelect && agrupacionesIbpList.length > 0) {
+        agrupacionIbpSelect.innerHTML = '<option value="">Seleccione...</option>';
+        agrupacionesIbpList.forEach(item => {
+          const opt = document.createElement("option"); opt.value = item; opt.textContent = item; agrupacionIbpSelect.appendChild(opt);
+        });
+      }
+    }
+  }
+
+  if (ccCanalNuevoSelect) {
+    ccCanalNuevoSelect.addEventListener("change", () => {
+      updateComercialFieldsCambioCanal(ccCanalNuevoSelect.value);
+    });
+  }
+
 
   // --- COMPORTAMIENTO DE FACTURACIÓN Y CONDICIONES FISCALES ---
   const tipoFacturaSelect = document.getElementById("tipo-factura");
@@ -587,6 +663,24 @@ document.addEventListener("alpuraDataLoaded", () => {
       });
     }
   });
+
+  // Al cambiar Régimen Fiscal (Cambio a Factura Individual)
+  const cfRegimenSelect = document.getElementById("cf-regimen-fiscal");
+  const cfUsoCfdiSelect = document.getElementById("cf-uso-cfdi");
+  if (cfRegimenSelect && cfUsoCfdiSelect) {
+    cfRegimenSelect.addEventListener("change", () => {
+      const regimenVal = cfRegimenSelect.value;
+      cfUsoCfdiSelect.innerHTML = '<option value="">Seleccione...</option>';
+      if (regimenVal && data.regimenesFiscales[regimenVal]) {
+        data.regimenesFiscales[regimenVal].forEach(uso => {
+          const opt = document.createElement("option");
+          opt.value = uso;
+          opt.textContent = uso;
+          cfUsoCfdiSelect.appendChild(opt);
+        });
+      }
+    });
+  }
 
 
   // --- PROCESO DE VALIDACIÓN COMPLETO DE FORMULARIO ---
@@ -2385,5 +2479,631 @@ document.addEventListener("alpuraDataLoaded", () => {
 
   // Inicializar módulo masivo
   initMasivo();
+
+  // --- LÓGICA VISTA CAMBIO FACTURA ---
+  function initCambioFactura() {
+    const btnBack = document.getElementById("btn-back-factura");
+    const btnMenu = document.getElementById("btn-menu-factura");
+    const btnClear = document.getElementById("btn-clear-factura");
+    const form = document.getElementById("cambio-factura-form");
+
+    function updateFecha() {
+      const fechaInput = document.getElementById("cf-fecha");
+      if (fechaInput) {
+        const today = new Date();
+        fechaInput.value = today.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      }
+    }
+    updateFecha();
+
+    function clearFactura() {
+      if (confirm("¿Limpiar todo el formulario?")) {
+        form.reset();
+        document.querySelectorAll("#cambio-factura-form .field-group").forEach(g => g.classList.remove("has-error"));
+        const cfUsoCfdiSelect = document.getElementById("cf-uso-cfdi");
+        if (cfUsoCfdiSelect) cfUsoCfdiSelect.innerHTML = '<option value="">Seleccione Régimen primero...</option>';
+        updateFecha();
+        document.getElementById("cf-comentarios-counter").innerText = "0/500";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
+
+    if (btnBack) btnBack.addEventListener("click", () => switchView("home"));
+    if (btnMenu) btnMenu.addEventListener("click", () => switchView("home"));
+    if (btnClear) btnClear.addEventListener("click", clearFactura);
+
+    if (form) {
+        form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        updateFecha();
+        
+        let hasError = false;
+        document.querySelectorAll("#cambio-factura-form .field-group, #cambio-factura-form .field-group-inline").forEach(g => g.classList.remove("has-error"));
+        
+        const numCliente = document.getElementById("cf-num-cliente").value;
+        if (!/^\d{5,6}$/.test(numCliente)) { document.getElementById("cf-num-cliente").closest(".field-group").classList.add("has-error"); hasError = true; }
+        
+        const razonSocial = document.getElementById("cf-razon-social").value;
+        if (!razonSocial.trim()) { document.getElementById("cf-razon-social").closest(".field-group").classList.add("has-error"); hasError = true; }
+        
+        const solicitante = document.getElementById("cf-solicitante").value;
+        if (!solicitante.trim()) { document.getElementById("cf-solicitante").closest(".field-group").classList.add("has-error"); hasError = true; }
+        
+        const formaPago = document.getElementById("cf-forma-pago").value;
+        if (!formaPago) { document.getElementById("cf-forma-pago").closest(".field-group").classList.add("has-error"); hasError = true; }
+        
+        const rfc = document.getElementById("cf-rfc").value;
+        const rfcRegex = /^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/i;
+        if (!rfcRegex.test(rfc)) { document.getElementById("cf-rfc").closest(".field-group").classList.add("has-error"); hasError = true; }
+        
+        const regimenFiscal = document.getElementById("cf-regimen-fiscal").value;
+        if (!regimenFiscal) { document.getElementById("cf-regimen-fiscal").closest(".field-group").classList.add("has-error"); hasError = true; }
+        
+        const usoCfdi = document.getElementById("cf-uso-cfdi").value;
+        if (!usoCfdi) { document.getElementById("cf-uso-cfdi").closest(".field-group").classList.add("has-error"); hasError = true; }
+        
+        const facNombre = document.getElementById("cf-fac-nombre").value;
+        if (!facNombre.trim()) {
+          const group = document.getElementById("cf-fac-nombre").closest(".field-group-inline") || document.getElementById("cf-fac-nombre").closest(".field-group");
+          if (group) group.classList.add("has-error");
+          hasError = true;
+        }
+
+        const email = document.getElementById("cf-fac-email").value;
+        const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
+        if (!emailRegex.test(email)) { 
+          const group = document.getElementById("cf-fac-email").closest(".field-group-inline") || document.getElementById("cf-fac-email").closest(".field-group");
+          if (group) group.classList.add("has-error"); 
+          hasError = true; 
+        }
+
+        if (hasError) {
+          alert("Por favor corrija o complete los campos marcados antes de generar la solicitud.");
+          return;
+        }
+
+        let stylesText = "";
+        try {
+          const stylesResponse = await fetch('styles.css');
+          stylesText = await stylesResponse.text();
+        } catch (err) {
+          console.warn("No se pudo cargar styles.css para el PDF/HTML", err);
+        }
+
+        const viewElement = document.getElementById("cambio-factura-view");
+        const viewClone = viewElement.cloneNode(true);
+
+        const actionsBar = viewClone.querySelector('.form-actions-bar');
+        if (actionsBar) actionsBar.remove();
+
+        const btnBack = viewClone.querySelector('.btn-back');
+        if (btnBack) btnBack.remove();
+
+        const originalInputs = viewElement.querySelectorAll('input, select, textarea');
+        const clonedInputs = viewClone.querySelectorAll('input, select, textarea');
+
+        originalInputs.forEach((orig, index) => {
+          const clone = clonedInputs[index];
+          if (orig.tagName === 'SELECT') {
+            const selectedText = orig.options[orig.selectedIndex]?.text || '';
+            const inputReplacement = document.createElement('input');
+            inputReplacement.type = 'text';
+            inputReplacement.setAttribute('value', selectedText);
+            inputReplacement.className = clone.className;
+            inputReplacement.setAttribute('readonly', 'true');
+            inputReplacement.style.width = '100%';
+            inputReplacement.style.padding = '8px 12px';
+            inputReplacement.style.border = '1px solid #ccc';
+            inputReplacement.style.borderRadius = '4px';
+            inputReplacement.style.backgroundColor = '#f9fafb';
+            clone.parentNode.replaceChild(inputReplacement, clone);
+          } else if (orig.tagName === 'TEXTAREA') {
+            clone.textContent = orig.value;
+            clone.setAttribute('readonly', 'true');
+            clone.style.backgroundColor = '#f9fafb';
+          } else {
+            clone.setAttribute('value', orig.value);
+            clone.setAttribute('readonly', 'true');
+            clone.style.backgroundColor = '#f9fafb';
+          }
+        });
+
+        const htmlContent = `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Solicitud Cambio Factura - ${numCliente}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    ${stylesText}
+    body { background-color: #eef2f5; padding: 30px; margin: 0; font-family: 'Inter', sans-serif; }
+    .view { display: block; position: static; max-width: 900px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 8px; background: white; padding-bottom: 30px; }
+    input[readonly] { color: #111 !important; font-weight: 500; border-color: #d1d5db !important; cursor: default; }
+    .form-header { padding: 20px 30px; }
+  </style>
+</head>
+<body>
+  ${viewClone.outerHTML}
+</body>
+</html>`;
+        
+        const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
+        window.saveAs(blob, `CambioFactura_${numCliente}.html`);
+        alert("Solicitud descargada exitosamente.");
+        form.reset();
+        switchView("home");
+      });
+    }
+  }
+
+  // --- LÓGICA VISTA CAMBIO CANAL ---
+  function initCambioCanal() {
+    const btnBack = document.getElementById("btn-back-canal");
+    const btnMenu = document.getElementById("btn-menu-canal");
+    const btnClear = document.getElementById("btn-clear-canal");
+    const form = document.getElementById("cambio-canal-form");
+
+    function updateFechaCanal() {
+      const fechaInput = document.getElementById("cc-fecha");
+      if (fechaInput) {
+        const today = new Date();
+        fechaInput.value = today.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      }
+    }
+    updateFechaCanal();
+
+    function clearCanal() {
+      if (confirm("¿Limpiar todo el formulario?")) {
+        form.reset();
+        document.querySelectorAll("#cambio-canal-form .field-group").forEach(g => g.classList.remove("has-error"));
+        updateFechaCanal();
+        document.getElementById("cc-comentarios-counter").innerText = "0/500";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
+
+    if (btnBack) btnBack.addEventListener("click", () => switchView("home"));
+    if (btnMenu) btnMenu.addEventListener("click", () => switchView("home"));
+    if (btnClear) btnClear.addEventListener("click", clearCanal);
+
+    if (form) {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        updateFechaCanal();
+        
+        let hasError = false;
+        document.querySelectorAll("#cambio-canal-form .field-group").forEach(g => g.classList.remove("has-error"));
+
+        const requiredIds = [
+          "cc-num-cliente", "cc-razon-social", "cc-canal-actual",
+          "cc-canal-nuevo", "cc-subcanal", "cc-giro", "cc-agrupacion", "cc-agrupacion-ibp", "cc-solicitante"
+        ];
+
+        requiredIds.forEach(id => {
+          const el = document.getElementById(id);
+          if (el && !el.value.trim()) {
+            el.closest(".field-group").classList.add("has-error");
+            hasError = true;
+          }
+        });
+
+        const numCliente = document.getElementById("cc-num-cliente").value;
+        if (!/^\d{5,6}$/.test(numCliente)) {
+          document.getElementById("cc-num-cliente").closest(".field-group").classList.add("has-error");
+          hasError = true;
+        }
+
+        if (hasError) {
+          alert("Por favor corrija los campos requeridos antes de generar la solicitud.");
+          return;
+        }
+
+        let stylesText = "";
+        try {
+          const stylesResponse = await fetch('styles.css');
+          stylesText = await stylesResponse.text();
+        } catch (err) {
+          console.warn("No se pudo cargar styles.css para el HTML", err);
+        }
+
+        const viewElement = document.getElementById("cambio-canal-view");
+        const viewClone = viewElement.cloneNode(true);
+
+        const actionsBar = viewClone.querySelector('.form-actions-bar');
+        if (actionsBar) actionsBar.remove();
+        const btnBackEl = viewClone.querySelector('.btn-back');
+        if (btnBackEl) btnBackEl.remove();
+
+        const originalInputs = viewElement.querySelectorAll('input, select, textarea');
+        const clonedInputs = viewClone.querySelectorAll('input, select, textarea');
+
+        originalInputs.forEach((orig, index) => {
+          const clone = clonedInputs[index];
+          if (orig.tagName === 'SELECT') {
+            const selectedText = orig.options[orig.selectedIndex]?.text || '';
+            const inputReplacement = document.createElement('input');
+            inputReplacement.type = 'text';
+            inputReplacement.setAttribute('value', selectedText);
+            inputReplacement.className = clone.className;
+            inputReplacement.setAttribute('readonly', 'true');
+            inputReplacement.style.width = '100%';
+            inputReplacement.style.padding = '8px 12px';
+            inputReplacement.style.border = '1px solid #ccc';
+            inputReplacement.style.borderRadius = '4px';
+            inputReplacement.style.backgroundColor = '#f9fafb';
+            clone.parentNode.replaceChild(inputReplacement, clone);
+          } else if (orig.tagName === 'TEXTAREA') {
+            clone.textContent = orig.value;
+            clone.setAttribute('readonly', 'true');
+            clone.style.backgroundColor = '#f9fafb';
+          } else {
+            clone.setAttribute('value', orig.value);
+            clone.setAttribute('readonly', 'true');
+            clone.style.backgroundColor = '#f9fafb';
+          }
+        });
+
+        const htmlContent = `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Solicitud Cambio Canal - ${numCliente}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    ${stylesText}
+    body { background-color: #eef2f5; padding: 30px; margin: 0; font-family: 'Inter', sans-serif; }
+    .view { display: block; position: static; max-width: 900px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-radius: 8px; background: white; padding-bottom: 30px; }
+    input[readonly], textarea[readonly] { color: #111 !important; font-weight: 500; border-color: #d1d5db !important; cursor: default; }
+    .form-header { padding: 20px 30px; }
+  </style>
+</head>
+<body>
+  ${viewClone.outerHTML}
+</body>
+</html>`;
+        
+        const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
+        window.saveAs(blob, `CambioCanal_${numCliente}.html`);
+        alert("Solicitud descargada exitosamente.");
+        form.reset();
+        document.querySelectorAll("#cambio-canal-form .field-group").forEach(g => g.classList.remove("has-error"));
+        updateFechaCanal();
+        document.getElementById("cc-comentarios-counter").innerText = "0/500";
+        switchView("home");
+      });
+    }
+  }
+
+  // --- LÓGICA VISTA REACTIVACIÓN ---
+  function initReactivacion() {
+    const btnBack = document.getElementById("btn-back-react");
+    const btnMenu = document.getElementById("btn-menu-react");
+    const btnClear = document.getElementById("btn-clear-react");
+    const form = document.getElementById("reactivacion-form");
+    const cedisGlobal = document.getElementById("rc-cedis-global");
+
+    if (btnBack) btnBack.addEventListener("click", () => switchView("home"));
+    if (btnMenu) btnMenu.addEventListener("click", () => switchView("home"));
+    if (btnClear) btnClear.addEventListener("click", () => {
+      if (confirm("¿Limpiar todo el formulario?")) { form.reset(); }
+    });
+
+    if (cedisGlobal) {
+      cedisGlobal.addEventListener("change", () => {
+        const cedisVal = cedisGlobal.value;
+        const inputCedis = document.querySelector('input[name="rc-cedis"]');
+        const plazaSelect = document.querySelector('select[name="rc-plaza"]');
+        const rutaSelect = document.querySelector('select[name="rc-ruta"]');
+
+        if (inputCedis) inputCedis.value = cedisVal;
+        
+        if (plazaSelect) plazaSelect.innerHTML = '<option value=""></option>';
+        if (rutaSelect) rutaSelect.innerHTML = '<option value=""></option>';
+
+        if (cedisVal && data.cedis[cedisVal]) {
+          const mapping = data.cedis[cedisVal];
+          if (plazaSelect) {
+            mapping.plazas.forEach(plaza => {
+              const opt = document.createElement("option"); opt.value = plaza; opt.textContent = plaza; plazaSelect.appendChild(opt);
+            });
+            if (cedisVal !== "ANDEN PLANTA" && cedisVal !== "DISTRIBUIDORES" && mapping.plazas.length > 0) {
+              plazaSelect.value = mapping.plazas[0];
+            }
+          }
+          if (rutaSelect) {
+            mapping.rutas.forEach(ruta => {
+              const opt = document.createElement("option"); opt.value = ruta; opt.textContent = ruta; rutaSelect.appendChild(opt);
+            });
+          }
+        }
+      });
+    }
+
+    const cpInput = document.querySelector('input[name="rc-cp"]');
+    const latInput = document.querySelector('input[name="rc-lat"]');
+    const lonInput = document.querySelector('input[name="rc-lon"]');
+
+    function checkRealTimeGeo() {
+      const lat = parseFloat(latInput.value);
+      const lon = parseFloat(lonInput.value);
+      const cp = cpInput.value;
+
+      latInput.style.border = "";
+      lonInput.style.border = "";
+      latInput.title = "";
+      lonInput.title = "";
+
+      if (latInput.value && lonInput.value && cp && data.codigosPostales[cp]) {
+        const dbCp = data.codigosPostales[cp];
+        const distancia = calcularDistanciaKm(lat, lon, parseFloat(dbCp.latitud), parseFloat(dbCp.longitud));
+        const umbral = dbCp.zona === "RURAL" ? 15 : 2.5;
+        if (distancia > umbral) {
+           latInput.style.border = "2px solid #d32f2f";
+           lonInput.style.border = "2px solid #d32f2f";
+           latInput.title = `Geo-alerta: Distancia de ${distancia.toFixed(2)}km excede el umbral de ${umbral}km.`;
+           lonInput.title = latInput.title;
+        }
+      }
+    }
+
+    if (latInput) {
+      latInput.addEventListener("input", checkRealTimeGeo);
+      latInput.addEventListener("blur", () => {
+        let val = latInput.value.trim();
+        if (!val) return;
+        val = val.replace(/[^0-9.-]/g, "");
+        const parts = val.split(".");
+        let integerPart = parts[0] || "0";
+        let decimalPart = parts[1] || "";
+        decimalPart = (decimalPart + "000000").substring(0, 6);
+        latInput.value = `${integerPart}.${decimalPart}`;
+        checkRealTimeGeo();
+      });
+    }
+    
+    if (lonInput) {
+      lonInput.addEventListener("input", checkRealTimeGeo);
+      lonInput.addEventListener("blur", () => {
+        let val = lonInput.value.trim();
+        if (!val) return;
+        let cleaned = val.replace(/[^0-9.]/g, "");
+        const parts = cleaned.split(".");
+        let integerPart = parts[0] || "0";
+        let decimalPart = parts[1] || "";
+        let forcedDecimals = 6;
+        if (integerPart.length === 2) forcedDecimals = 6;
+        else if (integerPart.length === 3) forcedDecimals = 5;
+        const padding = "0".repeat(forcedDecimals);
+        decimalPart = (decimalPart + padding).substring(0, forcedDecimals);
+        lonInput.value = `-${integerPart}.${decimalPart}`;
+        checkRealTimeGeo();
+      });
+    }
+
+    if (cpInput) {
+      cpInput.addEventListener("input", () => {
+        const cp = cpInput.value;
+        const colSelect = document.querySelector('select[name="rc-colonia"]');
+        if (cp.length === 5 && data.codigosPostales[cp]) {
+          if (colSelect) {
+            colSelect.innerHTML = '<option value=""></option>';
+            data.codigosPostales[cp].colonias.forEach(col => {
+              const opt = document.createElement("option"); opt.value = col; opt.textContent = col; colSelect.appendChild(opt);
+            });
+          }
+        }
+        checkRealTimeGeo();
+      });
+    }
+
+
+    
+    function validateGeo() {
+      const lat = parseFloat(latInput.value);
+      const lon = parseFloat(lonInput.value);
+      const cp = document.querySelector('input[name="rc-cp"]').value;
+      if (lat && lon && cp && data.codigosPostales[cp]) {
+        const dbCp = data.codigosPostales[cp];
+        const distancia = calcularDistanciaKm(lat, lon, parseFloat(dbCp.latitud), parseFloat(dbCp.longitud));
+        const umbral = dbCp.zona === "RURAL" ? 15 : 2.5;
+        if (distancia > umbral) {
+          return `La distancia calculada es de ${distancia.toFixed(2)}km, lo cual excede el máximo permitido de ${umbral}km para la zona de este CP.`;
+        }
+      }
+      return null;
+    }
+
+    let reactivacionRecords = [];
+
+    function clearInputRow() {
+      document.querySelector('input[name="rc-num-cliente"]').value = "";
+      document.querySelector('input[name="rc-num-sucursal"]').value = "";
+      document.querySelector('input[name="rc-razon"]').value = "";
+      document.querySelector('input[name="rc-comercial"]').value = "";
+      document.querySelector('input[name="rc-calle"]').value = "";
+      document.querySelector('input[name="rc-numero"]').value = "";
+      document.querySelector('input[name="rc-entre"]').value = "";
+      document.querySelector('input[name="rc-ycalle"]').value = "";
+      document.querySelector('input[name="rc-cp"]').value = "";
+      document.querySelector('select[name="rc-colonia"]').innerHTML = '<option value=""></option>';
+      document.querySelector('input[name="rc-lat"]').value = "";
+      document.querySelector('input[name="rc-lon"]').value = "";
+      document.querySelectorAll('input[name="rc-visita"]').forEach(cb => cb.checked = false);
+    }
+
+    function getCurrentRecord() {
+      const numCliente = document.querySelector('input[name="rc-num-cliente"]').value;
+      const numSucursal = document.querySelector('input[name="rc-num-sucursal"]').value;
+      
+      if (!numCliente && !numSucursal) return null; // Fila vacía
+      
+      let errores = [];
+      const cp = document.querySelector('input[name="rc-cp"]').value;
+      const colonia = document.querySelector('select[name="rc-colonia"]').value;
+      const razon = document.querySelector('input[name="rc-razon"]').value;
+      const calle = document.querySelector('input[name="rc-calle"]').value;
+      const numero = document.querySelector('input[name="rc-numero"]').value;
+      const lat = document.querySelector('input[name="rc-lat"]').value;
+      const lon = document.querySelector('input[name="rc-lon"]').value;
+      const plaza = document.querySelector('select[name="rc-plaza"]').value;
+      const ruta = document.querySelector('select[name="rc-ruta"]').value;
+      const dias = Array.from(document.querySelectorAll('input[name="rc-visita"]:checked')).map(cb => cb.value).join(",");
+
+      if (!/^\d{5,6}$/.test(numCliente)) errores.push("NUM CLIENTE (5-6 dígitos)");
+      if (!/^\d{1,3}$/.test(numSucursal)) errores.push("NUM SUCURSAL (1-3 dígitos)");
+      if (!cedisGlobal.value) errores.push("SELECCIONE CEDIS (En la parte superior)");
+      if (!razon.trim()) errores.push("RAZÓN SOCIAL");
+      if (!calle.trim()) errores.push("CALLE");
+      if (!numero.trim()) errores.push("NÚMERO");
+      if (!cp || cp.length !== 5) errores.push("CÓDIGO POSTAL (5 dígitos)");
+      if (!colonia) errores.push("COLONIA");
+      
+      if (!lat) {
+        errores.push("LATITUD");
+      } else if (parseFloat(lat) < 14 || parseFloat(lat) > 33) {
+        errores.push("LATITUD (Debe estar en rango de México: 14 a 33)");
+      }
+
+      if (!lon) {
+        errores.push("LONGITUD");
+      } else if (parseFloat(lon) > -86 || parseFloat(lon) < -118) {
+        errores.push("LONGITUD (Debe ser un valor negativo en rango de México: -86 a -118)");
+      }
+
+      if (!plaza) errores.push("PLAZA DIST.");
+
+      if (errores.length > 0) {
+        alert("Por favor corrija o complete los campos requeridos (*):\n- " + errores.join("\n- "));
+        return false; // Error
+      }
+
+      const geoWarning = validateGeo();
+      if (geoWarning) {
+        if (!confirm(`Alerta Geográfica: ${geoWarning}\n¿Desea agregar este registro de todos modos?`)) {
+          return false;
+        }
+      }
+
+      return [
+        numCliente,
+        numSucursal,
+        document.querySelector('input[name="rc-razon"]').value,
+        document.querySelector('input[name="rc-comercial"]').value,
+        document.querySelector('input[name="rc-calle"]').value,
+        document.querySelector('input[name="rc-numero"]').value,
+        document.querySelector('input[name="rc-cp"]').value,
+        document.querySelector('select[name="rc-colonia"]').value,
+        document.querySelector('input[name="rc-lat"]').value,
+        document.querySelector('input[name="rc-lon"]').value,
+        cedisGlobal.value,
+        document.querySelector('select[name="rc-plaza"]').value,
+        document.querySelector('select[name="rc-ruta"]').value,
+        Array.from(document.querySelectorAll('input[name="rc-visita"]:checked')).map(cb => cb.value).join(",")
+      ];
+    }
+
+    const btnAddRecord = document.getElementById("btn-add-reactivacion-record");
+    if (btnAddRecord) {
+      btnAddRecord.addEventListener("click", () => {
+        const record = getCurrentRecord();
+        if (record === false) return; // Validación falló
+        if (record === null) {
+          alert("La fila actual está vacía.");
+          return;
+        }
+
+        reactivacionRecords.push(record);
+        
+        // Agregar a la tabla visual
+        const tbody = document.getElementById("reactivacion-records");
+        const tr = document.createElement("tr");
+        record.forEach(val => {
+          const td = document.createElement("td");
+          td.textContent = val;
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+
+        // Limpiar fila de input
+        clearInputRow();
+      });
+    }
+
+    if (form) {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        
+        // Intentar agregar el registro actual si tiene algo
+        const currentRecord = getCurrentRecord();
+        if (currentRecord === false) return; // Validación falló
+        if (currentRecord !== null) {
+          reactivacionRecords.push(currentRecord);
+        }
+
+        if (reactivacionRecords.length === 0) {
+          alert("No hay registros para enviar.");
+          return;
+        }
+
+        const workbook = new ExcelJS.Workbook();
+        const ws = workbook.addWorksheet('Reactivaciones');
+        
+        // Configurar columnas y encabezados
+        ws.columns = [
+          { header: "ID CLIENTE", width: 15 },
+          { header: "ID SUCURSAL", width: 15 },
+          { header: "RAZON SOCIAL", width: 40 },
+          { header: "NOMBRE COMERCIAL", width: 40 },
+          { header: "CALLE", width: 30 },
+          { header: "NUMERO", width: 15 },
+          { header: "CP", width: 12 },
+          { header: "COLONIA", width: 30 },
+          { header: "LAT", width: 15 },
+          { header: "LON", width: 15 },
+          { header: "CEDIS", width: 25 },
+          { header: "PLAZA", width: 25 },
+          { header: "RUTA", width: 15 },
+          { header: "DIAS VISITA", width: 20 }
+        ];
+        ws.getRow(1).font = { bold: true };
+        
+        reactivacionRecords.forEach(rec => ws.addRow(rec));
+
+        // Proteger la hoja contra escritura
+        ws.protect('alpura', {
+          selectLockedCells: true,
+          selectUnlockedCells: true,
+          formatCells: false,
+          insertRows: false,
+          deleteRows: false,
+          insertColumns: false,
+          deleteColumns: false
+        });
+
+        const firstNum = reactivacionRecords[0][0];
+        const fileName = `Reactivacion_${firstNum}_${reactivacionRecords.length}_regs.xlsx`;
+
+        workbook.xlsx.writeBuffer().then(buffer => {
+          saveAs(new Blob([buffer]), fileName);
+          alert("Archivo Excel protegido descargado exitosamente.");
+        }).catch(err => {
+          console.error(err);
+          alert("Error al generar Excel.");
+        });
+        
+        // Limpiar todo
+        reactivacionRecords = [];
+        document.getElementById("reactivacion-records").innerHTML = "";
+        form.reset();
+        switchView("home");
+      });
+    }
+  }
+
+  initCambioFactura();
+  initCambioCanal();
+  initReactivacion();
 
 });

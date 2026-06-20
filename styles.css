@@ -241,6 +241,32 @@ body {
   letter-spacing: 0.5px;
 }
 
+/* Nuevas clases para tarjetas de mitad de altura */
+.menu-card-half {
+  padding: 20px 20px;
+}
+
+.menu-card-half .card-icon {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 15px;
+}
+
+.menu-card-half .card-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.menu-card-half h3 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.menu-card-half p {
+  font-size: 0.85rem;
+  margin-bottom: 15px;
+}
+
 .home-footer {
   color: var(--text-light);
   font-size: 0.85rem;
@@ -352,6 +378,7 @@ body {
 
 /* Clases de columnas (12 columnas) */
 .col-12 { width: 100%; }
+.col-9 { width: 75%; }
 .col-8 { width: 66.66%; }
 .col-6 { width: 50%; }
 .col-4 { width: 33.33%; }
