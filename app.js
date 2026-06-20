@@ -1,7 +1,9 @@
-// app.js - Controlador principal y validaciones del Portal RTM Alpura
+// app.js — Lógica principal de la aplicación Portal RTM Alpura.
+// Aquí se controla: navegación entre pantallas, validación de campos,
+// comportamiento dinámico de los selectores y generación de archivos descargables.
 
 document.addEventListener("alpuraDataLoaded", () => {
-  // --- ELEMENTOS DE VISTA ---
+  // Referencia a cada pantalla de la app (menú principal y cada formulario).
   const views = {
     home: document.getElementById("home-view"),
     individual: document.getElementById("individual-view"),
@@ -12,7 +14,8 @@ document.addEventListener("alpuraDataLoaded", () => {
     reactivacion: document.getElementById("reactivacion-view")
   };
 
-  // --- NAVEGACIÓN ---
+  // Función de navegación: oculta todas las pantallas y muestra solo la pedida.
+  // También sube el scroll hasta arriba para que el usuario empiece desde el tope.
   function switchView(viewName) {
     Object.keys(views).forEach(key => {
       if (key === viewName) {
@@ -24,7 +27,7 @@ document.addEventListener("alpuraDataLoaded", () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // Eventos de botones del Menú Principal
+  // Cada botón del menú principal lleva a su formulario correspondiente.
   document.getElementById("btn-to-individual").addEventListener("click", () => switchView("individual"));
   document.getElementById("btn-to-sucursal").addEventListener("click", () => switchView("sucursal"));
   document.getElementById("btn-to-masivo").addEventListener("click", () => switchView("masivo"));
@@ -32,10 +35,10 @@ document.addEventListener("alpuraDataLoaded", () => {
   if (document.getElementById("btn-to-cambio-canal")) document.getElementById("btn-to-cambio-canal").addEventListener("click", () => switchView("cambioCanal"));
   if (document.getElementById("btn-to-reactivacion")) document.getElementById("btn-to-reactivacion").addEventListener("click", () => switchView("reactivacion"));
 
-  // Eventos de botones de regreso
+  // Botón "Volver" del formulario individual: limpia todo antes de regresar al menú.
   document.getElementById("btn-back-1").addEventListener("click", () => {
     if (confirm("¿Desea regresar al menú principal y limpiar el formulario?")) {
-      // Re‑utilizar la lógica de limpieza
+      // Limpia el formulario completo (igual que si presionaras "Limpiar Formulario")
       form.reset();
       diasPagoCheckboxes.forEach(chk => chk.checked = false);
       diasPagoTrigger.textContent = "Seleccione días...";
@@ -56,7 +59,7 @@ document.addEventListener("alpuraDataLoaded", () => {
   });
 
 
-  // --- INICIALIZACIÓN DE FECHA ---
+  // Pone la fecha de hoy en el campo de fecha del formulario. El usuario no puede editarla.
   const dateInput = document.getElementById("fecha");
   const today = new Date();
   const formattedDate = today.toLocaleDateString('es-MX', {
@@ -66,12 +69,13 @@ document.addEventListener("alpuraDataLoaded", () => {
   });
   dateInput.value = formattedDate;
 
-  // --- CARGA DE SELECTORES (CATÁLOGOS MOCK) ---
+  // Los catálogos (CEDIS, canales, CP, etc.) ya fueron cargados por mockData.js.
+  // Aquí los usamos para llenar los selectores al iniciar.
   const data = window.ALPURA_MOCK_DATA;
 
   function initSelect(id, list) {
     const select = document.getElementById(id);
-    // Limpiar opciones anteriores guardando la primera ("Seleccione...")
+    // Vacía las opciones anteriores y pone la opción por defecto antes de llenar.
     select.innerHTML = '<option value="">Seleccione...</option>';
     list.forEach(item => {
       const option = document.createElement("option");
@@ -81,7 +85,7 @@ document.addEventListener("alpuraDataLoaded", () => {
     });
   }
 
-  // Selectores estáticos del formulario individual
+  // Llena cada selector del formulario individual con su lista de opciones.
   initSelect("tipo-cliente", data.tiposCliente);
   initSelect("forma-pago", data.formasPago);
   initSelect("tipo-factura", data.tiposFactura);
@@ -97,17 +101,18 @@ document.addEventListener("alpuraDataLoaded", () => {
   initSelect("tipo-cuenta", data.tiposCuenta);
   initSelect("canal-venta", Object.keys(data.canalesVenta));
 
-  // Inicializar Régimen Fiscal completo
+  // Llena el selector de Régimen Fiscal con todas las claves disponibles.
   initSelect("regimen-fiscal", Object.keys(data.regimenesFiscales));
 
-  // Inicializar selectores de nuevas vistas
+  // Llena los selectores de las pantallas de Cambio de Factura, Cambio de Canal y Reactivación.
   if (document.getElementById("cf-forma-pago")) initSelect("cf-forma-pago", data.formasPago);
   if (document.getElementById("cf-regimen-fiscal")) initSelect("cf-regimen-fiscal", Object.keys(data.regimenesFiscales));
   if (document.getElementById("cc-canal-actual")) initSelect("cc-canal-actual", Object.keys(data.canalesVenta));
   if (document.getElementById("cc-canal-nuevo")) initSelect("cc-canal-nuevo", Object.keys(data.canalesVenta));
   if (document.getElementById("rc-cedis-global")) initSelect("rc-cedis-global", Object.keys(data.cedis));
 
-  // --- MULTISELECCIÓN DE DÍAS DE PAGO ---
+  // Selector de días de pago: funciona como un menú con casillas de verificación (checkboxes).
+  // Al hacer clic en el botón, se muestra/oculta el menú con los días de la semana.
   const diasPagoTrigger = document.getElementById("dias-pago-trigger");
   const diasPagoDropdown = document.getElementById("dias-pago-dropdown");
 
@@ -134,9 +139,11 @@ document.addEventListener("alpuraDataLoaded", () => {
   });
 
 
-  // --- FILTROS DE ENTRADA Y RESTRICCIONES DE TEXTO (VALIDACIÓN EN TIEMPO REAL) ---
+  // Validación en tiempo real: cada vez que el usuario escribe, se limpian y
+  // reformatean los datos automáticamente (mayúsculas, sin acentos, solo caracteres permitidos).
 
-  // Reemplazo de caracteres con acento a su equivalente sin acento
+  // Quita los acentos de un texto (ej. "á" → "a"). Necesario porque los sistemas SAP
+  // no aceptan caracteres acentuados.
   function removeAccents(str) {
     const map = {
       'Á': 'A', 'É': 'E', 'Í': 'I', 'Ó': 'O', 'Ú': 'U',
@@ -146,9 +153,10 @@ document.addEventListener("alpuraDataLoaded", () => {
     return str.replace(/[áéíóúüÁÉÍÓÚÜ]/g, match => map[match] || match);
   }
 
-  // Interceptar pegado de información en toda la app
+  // Bloquea la acción de pegar (Ctrl+V) en todos los campos excepto el área de carga masiva.
+  // Esto es una política RTM para asegurar que los datos se capturen y revisen manualmente.
   document.querySelectorAll("input, textarea, select").forEach(element => {
-    // Permitir pegar en el área de carga masiva
+    // El área de carga masiva sí permite pegar datos desde Excel.
     if (element.id === "pasteAreaMasivo") return;
 
     element.addEventListener("paste", (e) => {
@@ -157,7 +165,8 @@ document.addEventListener("alpuraDataLoaded", () => {
     });
   });
 
-  // Función global para calcular distancia entre dos coordenadas (Fórmula de Haversine)
+  // Calcula la distancia en kilómetros entre dos pares de coordenadas (latitud/longitud).
+  // Usa la fórmula de Haversine, que tiene en cuenta la curvatura de la Tierra.
   const calcularDistanciaKm = (lat1, lng1, lat2, lng2) => {
     const R = 6371; // Radio de la Tierra en km
     const toRad = deg => deg * Math.PI / 180;
@@ -219,48 +228,47 @@ document.addEventListener("alpuraDataLoaded", () => {
     }
   };
 
-  // Escuchar inputs para forzar mayúsculas/minúsculas y caracteres permitidos
+  // Se aplican los filtros de caracteres a todos los campos de texto de los formularios.
+  // También borra el borde rojo de error cuando el usuario empieza a corregir un campo.
   const inputs = document.querySelectorAll("#individual-client-form input, #individual-client-form textarea, #cambio-factura-form input, #cambio-canal-form input, #reactivacion-form input");
 
   inputs.forEach(input => {
-    if (input.id === "fecha") return; // Ignorar campo de fecha autogenerado
+    if (input.id === "fecha") return; // El campo de fecha lo llena la app, no el usuario.
 
     input.addEventListener("input", (e) => {
       let val = input.value;
 
-      // Quitar acentos
-      val = removeAccents(val);
+      val = removeAccents(val); // Elimina acentos primero
 
       if (input.type === "email") {
-        // eMAIL: Solo minúsculas y caracteres válidos
+        // Email: solo permite minúsculas y caracteres válidos para direcciones de correo
         val = val.toLowerCase().replace(/[^a-z0-9@._\-+]/g, "");
       } else {
-        // En cualquier otro input, todo a Mayúsculas
+        // Cualquier otro campo de texto: convierte todo a mayúsculas
         val = val.toUpperCase();
 
         if (input.id === "numero" || input.name === "rc-numero") {
-          // Campo NÚMERO: Permite Ñ, números, letras y la barra diagonal "/" (para S/N)
+          // Campo Número de calle: permite letras, números y "/" para "S/N"
           val = val.replace(/[^A-Z0-9 Ñ\/]/g, "");
         } else if (input.id === "latitud" || input.id === "longitud" || input.name === "rc-lat" || input.name === "rc-lon") {
-          // Latitud y Longitud: Solo números, punto y signo menos
+          // Latitud y Longitud: solo se permiten números, punto decimal y signo menos
           val = val.replace(/[^0-9.\-]/g, "");
         } else if (input.id === "codigo-postal" || input.id === "rep-telefono" || input.id === "fac-telefono" || input.id === "com-telefono" || input.id === "cf-fac-telefono" || input.name === "rc-cp" || input.id === "limite-credito") {
-          // Teléfonos, CP y Límite de Crédito: Solo números y punto
+          // Teléfonos, CP y Límite de Crédito: solo se permiten números (y punto para el crédito)
           if (input.id === "limite-credito") {
             val = val.replace(/[^0-9.]/g, "");
           } else {
             val = val.replace(/[^0-9]/g, "");
           }
         } else {
-          // Por defecto: Solo Ñ, Letras A-Z, Números 0-9 y Espacios (No se permiten otros especiales ni acentos)
+          // Para cualquier otro campo: solo letras A-Z, números, Ñ y espacios.
           val = val.replace(/[^A-Z0-9 Ñ]/g, "");
         }
       }
 
-      // Re-asignar valor sanitizado
-      input.value = val;
+      input.value = val; // Guarda el valor ya limpio en el campo
 
-      // Limpiar errores visuales al escribir
+      // Quita el borde rojo del campo mientras el usuario va escribiendo.
       const group = input.closest(".field-group");
       if (group) group.classList.remove("has-error");
     });
@@ -274,7 +282,9 @@ document.addEventListener("alpuraDataLoaded", () => {
   });
 
 
-  // --- COMPORTAMIENTO GEOGRÁFICO: CÓDIGO POSTAL Y COLONIAS ---
+  // Cuando el usuario escribe un Código Postal de 5 dígitos, busca automáticamente
+  // el estado, municipio y colonias disponibles en el catálogo SEPOMEX.
+  // Si el CP no existe, marca el campo en rojo.
   const cpInput = document.getElementById("codigo-postal");
   const coloniaSelect = document.getElementById("colonia");
   const estadoInput = document.getElementById("estado");
@@ -282,14 +292,14 @@ document.addEventListener("alpuraDataLoaded", () => {
 
   cpInput.addEventListener("input", () => {
     const cp = cpInput.value;
-    if (cp.length === 5) {
-      const dbCp = data.codigosPostales[cp];
-      if (dbCp) {
-        // CP Existente en la DB
+      if (cp.length === 5) {
+        const dbCp = data.codigosPostales[cp];
+        if (dbCp) {
+          // CP encontrado en el catálogo: carga estado, municipio y colonias
         estadoInput.value = dbCp.estado;
         municipioInput.value = dbCp.municipio;
 
-        // Cargar colonias
+          // Llena el selector de colonias con las opciones de ese CP
         coloniaSelect.innerHTML = '<option value="">Seleccione Colonia...</option>';
         dbCp.colonias.forEach(col => {
           const opt = document.createElement("option");
@@ -300,8 +310,8 @@ document.addEventListener("alpuraDataLoaded", () => {
 
         cpInput.closest(".field-group").classList.remove("has-error");
         validarGeoDistanciaEnTiempoReal(document.getElementById("latitud"), document.getElementById("longitud"), cpInput);
-      } else {
-        // CP No existente
+        } else {
+          // CP no encontrado en el catálogo: borra los campos y marca error
         clearGeoFields();
         cpInput.closest(".field-group").classList.add("has-error");
       }
@@ -317,7 +327,10 @@ document.addEventListener("alpuraDataLoaded", () => {
   }
 
 
-  // --- FORMATO DE GEOLOCALIZACIÓN (LATITUD Y LONGITUD) AL PERDER FOCO (BLUR) ---
+  // Cuando el usuario termina de escribir (sale del campo), formatea automáticamente
+  // la latitud y longitud con el número correcto de decimales.
+  // Latitud: siempre 6 decimales (ej. 19.421897)
+  // Longitud: 6 decimales si tiene 2 enteros, 5 si tiene 3 enteros (ej. -99.167539 o -100.12345)
   const latInput = document.getElementById("latitud");
   const lonInput = document.getElementById("longitud");
 
@@ -325,15 +338,15 @@ document.addEventListener("alpuraDataLoaded", () => {
     let val = latInput.value.trim();
     if (!val) return;
 
-    // Quitar cualquier carácter que no sea número, signo o punto
+    // Elimina cualquier carácter que no sea número, punto o signo menos
     val = val.replace(/[^0-9.-]/g, "");
 
-    // Separar parte entera y decimal
+    // Separa la parte entera de los decimales para procesarlos por separado
     const parts = val.split(".");
     let integerPart = parts[0] || "0";
     let decimalPart = parts[1] || "";
 
-    // Forzar exactamente 6 decimales
+    // Completa con ceros hasta tener exactamente 6 decimales
     decimalPart = (decimalPart + "000000").substring(0, 6);
     latInput.value = `${integerPart}.${decimalPart}`;
     validarGeoDistanciaEnTiempoReal(latInput, document.getElementById("longitud"), document.getElementById("codigo-postal"));
@@ -343,7 +356,7 @@ document.addEventListener("alpuraDataLoaded", () => {
     let val = lonInput.value.trim();
     if (!val) return;
 
-    // Asegurar signo negativo y limpiar
+    // Asegura que la longitud tenga signo negativo (en México siempre es negativa)
     let isNegative = val.startsWith("-");
     let cleaned = val.replace(/[^0-9.]/g, "");
 
@@ -358,7 +371,7 @@ document.addEventListener("alpuraDataLoaded", () => {
       forcedDecimals = 5;
     }
 
-    // Forzar decimales
+    // Rellena con ceros hasta el número correcto de decimales
     const padding = "0".repeat(forcedDecimals);
     decimalPart = (decimalPart + padding).substring(0, forcedDecimals);
 
@@ -367,7 +380,9 @@ document.addEventListener("alpuraDataLoaded", () => {
   });
 
 
-  // --- COMPORTAMIENTO LOGÍSTICO: CEDIS, PLAZA Y RUTA ---
+  // Cuando el usuario selecciona un CEDIS, la app busca sus datos en el catálogo
+  // y llena automáticamente: Plaza, Tipo de Entrega, Regional Responsable y Zona Nielsen.
+  // Para la mayoría de los CEDIS estos campos quedan bloqueados (no editables).
   const cedisSelect = document.getElementById("cedis-asignado");
   const plazaSelect = document.getElementById("plaza-distribucion");
   const rutaSelect = document.getElementById("ruta");
@@ -378,7 +393,7 @@ document.addEventListener("alpuraDataLoaded", () => {
   cedisSelect.addEventListener("change", () => {
     const cedisVal = cedisSelect.value;
 
-    // Reset defaults
+    // Primero borra los valores anteriores para empezar limpio
     plazaSelect.innerHTML = '<option value="">Seleccione Plaza...</option>';
     rutaSelect.innerHTML = '<option value="">Seleccione Ruta...</option>';
     plazaSelect.disabled = false;
@@ -403,7 +418,7 @@ document.addEventListener("alpuraDataLoaded", () => {
       const mapping = data.cedis[cedisVal];
 
       if (cedisVal !== "ANDEN PLANTA" && cedisVal !== "DISTRIBUIDORES") {
-        // Auto-asignar y bloquear
+          // Para la mayoría de CEDIS: la plaza se asigna sola y queda bloqueada
         plazaSelect.innerHTML = '';
         mapping.plazas.forEach(plaza => {
           const opt = document.createElement("option");
@@ -417,7 +432,7 @@ document.addEventListener("alpuraDataLoaded", () => {
           plazaSelect.classList.add("locked");
         }
       } else {
-        // Mostrar desplegable
+          // ANDEN PLANTA y DISTRIBUIDORES permiten elegir plaza manualmente
         mapping.plazas.forEach(plaza => {
           const opt = document.createElement("option");
           opt.value = plaza;
@@ -426,7 +441,7 @@ document.addEventListener("alpuraDataLoaded", () => {
         });
       }
 
-      // Poblar Rutas
+      // Llena el selector de rutas con las disponibles para ese CEDIS
       mapping.rutas.forEach(ruta => {
         const opt = document.createElement("option");
         opt.value = ruta;
@@ -434,7 +449,8 @@ document.addEventListener("alpuraDataLoaded", () => {
         rutaSelect.appendChild(opt);
       });
 
-      // Auto-asignar nuevos campos de CEDIS
+      // Si el CEDIS tiene Tipo de Entrega, Regional y Zona Nielsen definidos,
+      // los asigna automáticamente y los bloquea para que no se cambien.
       if (mapping.tipoEntrega && tipoEntregaSelect) {
         tipoEntregaSelect.value = mapping.tipoEntrega;
         tipoEntregaSelect.disabled = true;
@@ -454,7 +470,8 @@ document.addEventListener("alpuraDataLoaded", () => {
   });
 
 
-  // --- COMPORTAMIENTO COMERCIAL: SELECCIÓN DINÁMICA DE CANAL DE VENTA ---
+  // Cuando el usuario selecciona un Canal de Venta, la app busca sus datos
+  // y llena automáticamente: Macrocanal, Canal IBP, Giro, Subcanal, Agrupaciones.
   const canalVentaSelect = document.getElementById("canal-venta");
   const macroInput = document.getElementById("macrocanal");
   const canalIbpInput = document.getElementById("canal-venta-ibp");
@@ -464,7 +481,7 @@ document.addEventListener("alpuraDataLoaded", () => {
   const agrupacionIbpSelect = document.getElementById("agrupacion-ibp");
 
   function updateComercialFields(canalVal) {
-    // Resetear dependientes
+    // Borra los campos dependientes antes de cargar los nuevos valores
     macroInput.value = "";
     canalIbpInput.value = "";
     if (giroSelect) giroSelect.innerHTML = '<option value="">Seleccione Canal primero...</option>';
@@ -475,11 +492,11 @@ document.addEventListener("alpuraDataLoaded", () => {
     if (canalVal && data.canalesVenta && data.canalesVenta[canalVal]) {
       const channelData = data.canalesVenta[canalVal];
 
-      // Auto-rellenar campos bloqueados
+      // Macrocanal y Canal IBP se asignan solos y quedan bloqueados
       macroInput.value = channelData.macrocanal || "";
       canalIbpInput.value = channelData.canalIbp || "";
 
-      // Cargar Giros
+      // Llena el selector de Giros con las opciones del canal
       const girosList = Array.isArray(channelData.giros) ? channelData.giros : (channelData.giros ? [channelData.giros] : []);
       if (giroSelect && girosList.length > 0) {
         giroSelect.innerHTML = '<option value="">Seleccione...</option>';
@@ -491,7 +508,7 @@ document.addEventListener("alpuraDataLoaded", () => {
         });
       }
 
-      // Cargar Agrupaciones Clientes
+      // Llena el selector de Agrupación de Clientes
       const agrupacionesList = Array.isArray(channelData.agrupaciones) ? channelData.agrupaciones : (channelData.agrupaciones ? [channelData.agrupaciones] : []);
       if (agrupacionSelect && agrupacionesList.length > 0) {
         agrupacionSelect.innerHTML = '<option value="">Seleccione...</option>';
@@ -503,7 +520,7 @@ document.addEventListener("alpuraDataLoaded", () => {
         });
       }
 
-      // Cargar Subcanales (o Grupos Comerciales por retrocompatibilidad)
+      // Llena el selector de Subcanal (antes llamado "Grupo Comercial" en versiones anteriores)
       const subcanalesList = Array.isArray(channelData.subcanales) ? channelData.subcanales : (channelData.subcanales ? [channelData.subcanales] : (Array.isArray(channelData.gruposComerciales) ? channelData.gruposComerciales : []));
       if (subcanalSelect && subcanalesList.length > 0) {
         subcanalSelect.innerHTML = '<option value="">Seleccione...</option>';
@@ -515,7 +532,7 @@ document.addEventListener("alpuraDataLoaded", () => {
         });
       }
 
-      // Cargar Agrupación IBP
+      // Llena el selector de Agrupación IBP
       const agrupacionesIbpList = Array.isArray(channelData.agrupacionesIbp) ? channelData.agrupacionesIbp : (channelData.agrupacionesIbp ? [channelData.agrupacionesIbp] : []);
       if (agrupacionIbpSelect && agrupacionesIbpList.length > 0) {
         agrupacionIbpSelect.innerHTML = '<option value="">Seleccione...</option>';
@@ -535,7 +552,8 @@ document.addEventListener("alpuraDataLoaded", () => {
     });
   }
 
-  // Lógica para Cambio de Canal
+  // Lo mismo que la función anterior pero para el formulario de Cambio de Canal.
+  // Al elegir el canal nuevo, rellena los campos de la nueva estructura comercial.
   const ccCanalNuevoSelect = document.getElementById("cc-canal-nuevo");
   function updateComercialFieldsCambioCanal(canalVal) {
     const macroInput = document.getElementById("cc-macrocanal");
@@ -599,13 +617,15 @@ document.addEventListener("alpuraDataLoaded", () => {
   }
 
 
-  // --- COMPORTAMIENTO DE FACTURACIÓN Y CONDICIONES FISCALES ---
+  // Maneja los cambios en el campo Tipo de Factura:
+  // - GLOBAL: bloquea RFC (usa el genérico), Régimen y CFDI con valores fijos.
+  // - INDIVIDUAL o CONCENTRADA: habilita esos campos para captura manual.
   const tipoFacturaSelect = document.getElementById("tipo-factura");
   const rfcInput = document.getElementById("rfc");
   const regimenSelect = document.getElementById("regimen-fiscal");
   const usoCfdiSelect = document.getElementById("uso-cfdi");
 
-  // Al cambiar tipo de factura
+  // Cuando el usuario cambia el tipo de factura se ajustan los campos fiscales
   tipoFacturaSelect.addEventListener("change", () => {
     const tipoVal = tipoFacturaSelect.value;
     const lblReq = document.querySelector(".lbl-factura-req");
@@ -615,23 +635,23 @@ document.addEventListener("alpuraDataLoaded", () => {
     }
 
     if (tipoVal === "GLOBAL") {
-      // Forzar Régimen a "616 - SIN OBLIGACIONES FISCALES"
+      // GLOBAL: RFC genérico automático, Régimen y CFDI bloqueados con valor fijo
       regimenSelect.value = "616 - SIN OBLIGACIONES FISCALES";
       regimenSelect.disabled = true;
       regimenSelect.classList.add("locked");
 
-      // Forzar Uso CFDI a "S01 - SIN EFECTOS FISCALES"
+      // RFC genérico para facturas globales (estándar del SAT)
       usoCfdiSelect.innerHTML = '<option value="S01 - SIN EFECTOS FISCALES">S01 - SIN EFECTOS FISCALES</option>';
       usoCfdiSelect.value = "S01 - SIN EFECTOS FISCALES";
       usoCfdiSelect.disabled = true;
       usoCfdiSelect.classList.add("locked");
 
-      // RFC Genérico Global y bloqueado
+      // RFC genérico para clientes con factura global, requerido por el SAT
       rfcInput.value = "XAXX010101000";
       rfcInput.readOnly = true;
       rfcInput.classList.add("locked");
     } else {
-      // Individual / Concentrada: Habilitar y limpiar para selección manual
+      // INDIVIDUAL o CONCENTRADA: habilita todos los campos para que el usuario los llene
       regimenSelect.disabled = false;
       regimenSelect.classList.remove("locked");
       regimenSelect.value = "";
@@ -648,7 +668,8 @@ document.addEventListener("alpuraDataLoaded", () => {
     }
   });
 
-  // Al cambiar Régimen Fiscal
+  // Cuando el usuario elige un Régimen Fiscal, se cargan solo los Usos de CFDI
+  // que son válidos para ese régimen (no todos los usos aplican a todos los regímenes).
   regimenSelect.addEventListener("change", () => {
     const regimenVal = regimenSelect.value;
     usoCfdiSelect.innerHTML = '<option value="">Seleccione...</option>';
@@ -664,7 +685,8 @@ document.addEventListener("alpuraDataLoaded", () => {
     }
   });
 
-  // Al cambiar Régimen Fiscal (Cambio a Factura Individual)
+  // Lo mismo pero para el formulario de Cambio a Factura Individual,
+  // que tiene sus propios selectores de Régimen y Uso de CFDI.
   const cfRegimenSelect = document.getElementById("cf-regimen-fiscal");
   const cfUsoCfdiSelect = document.getElementById("cf-uso-cfdi");
   if (cfRegimenSelect && cfUsoCfdiSelect) {
@@ -683,15 +705,17 @@ document.addEventListener("alpuraDataLoaded", () => {
   }
 
 
-  // --- PROCESO DE VALIDACIÓN COMPLETO DE FORMULARIO ---
+  // Función principal de validación del formulario de Alta Individual.
+  // Revisa todos los campos requeridos, formatos y reglas de negocio.
+  // Devuelve si el formulario es válido y la lista de campos con error.
   function validateForm() {
     let isValid = true;
     const errors = [];
 
-    // Limpiar errores visuales anteriores
+    // Borra todos los bordes rojos anteriores para empezar la validación limpio
     document.querySelectorAll(".field-group, .field-group-inline").forEach(g => g.classList.remove("has-error"));
 
-    // Auxiliar para marcar error
+    // Marca un campo en rojo y registra su ID en la lista de errores
     function setError(inputId, message = "") {
       const input = document.getElementById(inputId);
       const group = input.closest(".field-group") || input.closest(".field-group-inline");
@@ -706,7 +730,7 @@ document.addEventListener("alpuraDataLoaded", () => {
       errors.push(inputId);
     }
 
-    // 1. Validar requeridos estándar
+    // Lista de campos que SIEMPRE son obligatorios en el formulario individual
     const requiredIds = [
       "nombre-social", "nombre-comercial", "calle", "numero",
       "codigo-postal", "colonia",
@@ -718,6 +742,7 @@ document.addEventListener("alpuraDataLoaded", () => {
       "agrupacion-ibp", "solicito"
     ];
 
+    // Los canales OTROS y EXPORTACION no requieren coordenadas geográficas
     const canalVentaVal = document.getElementById("canal-venta").value.trim().toUpperCase();
     if (canalVentaVal !== "OTROS" && canalVentaVal !== "EXPORTACION") {
       requiredIds.push("latitud", "longitud");
@@ -730,7 +755,7 @@ document.addEventListener("alpuraDataLoaded", () => {
       }
     });
 
-    // Si requiere datos fiscales individuales
+    // Si el tipo de factura es INDIVIDUAL, también son obligatorios RFC, Régimen, CFDI y contacto de facturación
     if (tipoFacturaSelect.value === "INDIVIDUAL") {
       if (!rfcInput.value.trim()) setError("rfc", "El RFC es obligatorio para facturación individual.");
       if (!regimenSelect.value) setError("regimen-fiscal", "El Régimen Fiscal es obligatorio.");
@@ -743,17 +768,17 @@ document.addEventListener("alpuraDataLoaded", () => {
       if (!facEmail.value.trim()) setError("fac-email", "Requerido para INDIVIDUAL.");
     }
 
-    // 2. Validación Código Postal (5 números)
+    // El CP debe tener exactamente 5 dígitos y existir en el catálogo SEPOMEX
     const cpVal = cpInput.value.trim();
     if (cpVal && (!/^\d{5}$/.test(cpVal) || !data.codigosPostales[cpVal])) {
       setError("codigo-postal", "El código postal debe tener 5 dígitos y existir en el catálogo.");
     }
 
-    // 3. Validación Teléfonos (10 dígitos)
+    // Los teléfonos deben tener exactamente 10 dígitos numéricos
     const telIds = ["rep-telefono", "fac-telefono", "com-telefono"];
     telIds.forEach(id => {
       const val = document.getElementById(id).value.trim();
-      // Opcional en el caso de facturas, obligatorio en los otros
+      // Si el teléfono es opcional y está vacío, se permite. Si tiene algo, debe ser válido.
       const isReq = document.getElementById(id).hasAttribute("required");
       if (val) {
         if (!/^\d{10}$/.test(val)) {
@@ -764,7 +789,7 @@ document.addEventListener("alpuraDataLoaded", () => {
       }
     });
 
-    // 4. Validación eMAILs
+    // Los correos electrónicos deben tener formato válido (usuario@dominio.ext)
     const emailIds = ["rep-email", "fac-email", "com-email"];
     const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
     emailIds.forEach(id => {
@@ -779,7 +804,7 @@ document.addEventListener("alpuraDataLoaded", () => {
       }
     });
 
-    // 5. Validación RFC (3 o 4 letras + 6 números + 3 alfanuméricos)
+    // El RFC debe tener la estructura del SAT: 3-4 letras + 6 números + 3 alfanuméricos
     const rfcVal = rfcInput.value.trim();
     if (rfcVal) {
       const rfcRegex = /^[A-ZÑ]{3,4}\d{6}[A-Z0-9]{3}$/;
@@ -788,7 +813,7 @@ document.addEventListener("alpuraDataLoaded", () => {
       }
     }
 
-    // 6. Validación Latitud (##.000000)
+    // Latitud: debe ser ##.###### (exactamente 2 enteros y 6 decimales)
     const latVal = latInput.value.trim();
     if (latVal) {
       const latRegex = /^\d{2}\.\d{6}$/;
@@ -797,7 +822,7 @@ document.addEventListener("alpuraDataLoaded", () => {
       }
     }
 
-    // 7. Validación Longitud (-##.000000 o -###.00000)
+    // Longitud: puede ser -##.###### (2 enteros) o -###.##### (3 enteros)
     const lonVal = lonInput.value.trim();
     if (lonVal) {
       const lonRegex2 = /^-\d{2}\.\d{6}$/;
@@ -807,7 +832,8 @@ document.addEventListener("alpuraDataLoaded", () => {
       }
     }
 
-    // 7.5 Validación de Distancia Geográfica contra CP (Individual)
+    // Valida que las coordenadas estén cerca del Código Postal declarado.
+    // Si la distancia supera el umbral (5 km urbano / 10 km rural), se avisa al usuario.
     const cpValGeo = cpInput.value.trim();
     if (latVal && lonVal && cpValGeo && data.codigosPostales[cpValGeo]) {
       const ref = data.codigosPostales[cpValGeo];
@@ -822,7 +848,7 @@ document.addEventListener("alpuraDataLoaded", () => {
       }
     }
 
-    // 8. Validación Límite de Crédito (numérico)
+    // El límite de crédito no puede ser un número negativo
     const limCredInput = document.getElementById("limite-credito");
     if (limCredInput.value && parseFloat(limCredInput.value) < 0) {
       setError("limite-credito", "El límite de crédito no puede ser negativo.");
@@ -832,7 +858,8 @@ document.addEventListener("alpuraDataLoaded", () => {
   }
 
 
-  // --- GENERACIÓN DE PDF (A4 HORIZONTAL) ---
+  // Cuando el usuario presiona "Descargar Solicitud", se valida el formulario.
+  // Si hay errores, se muestran en rojo. Si todo está bien, se genera el HTML.
   const form = document.getElementById("individual-client-form");
 
   form.addEventListener("submit", (e) => {
@@ -841,6 +868,8 @@ document.addEventListener("alpuraDataLoaded", () => {
     const { isValid, errors } = validateForm();
 
     if (!isValid) {
+      // Caso especial: si el único error es la distancia de geolocalización,
+      // se puede confirmar y continuar de todas formas (no bloquea la descarga)
       const isOnlyGeoDistance = errors.every(e => e === "latitud" || e === "longitud") &&
         errors.length > 0 &&
         document.getElementById("latitud").closest(".field-group").querySelector(".error-msg").textContent.includes("Distancia");
@@ -866,11 +895,12 @@ document.addEventListener("alpuraDataLoaded", () => {
     }
 
 
-    // --- PROCESAR LA EXPORTACIÓN A HTML (DIMENSIONES ORIGINALES NO EDITABLES) ---
+    // Clona el formulario visible, guarda los valores de los campos
+    // y bloquea todos los inputs para que el archivo descargado no sea editable.
     const originalContainer = document.querySelector("#individual-view .form-container");
     const containerClone = originalContainer.cloneNode(true);
 
-    // Sincronizar valores y bloquear inputs
+    // Copia los valores actuales al clon (el clon no los tiene por ser una copia estructural)
     const originalInputs = originalContainer.querySelectorAll("input, select, textarea");
     const clonedInputs = containerClone.querySelectorAll("input, select, textarea");
 
@@ -891,15 +921,15 @@ document.addEventListener("alpuraDataLoaded", () => {
         clone.setAttribute("value", orig.value);
       }
 
-      // Bloquear
+      // Deshabilita el campo para que no se pueda editar en el archivo descargado
       clone.setAttribute("disabled", "disabled");
       clone.setAttribute("readonly", "readonly");
-      // Quitar posible estado de error
+      // Borra cualquier borde rojo de error que pudiera haberse copiado
       const parentGroup = clone.closest(".field-group") || clone.closest(".field-group-inline");
       if (parentGroup) parentGroup.classList.remove("has-error");
     }
 
-    // Ocultar botones de acción y volver
+    // Oculta los botones de acción en el archivo descargado (no deben aparecer en el formato final)
     const actionsBar = containerClone.querySelector(".form-actions-bar");
     if (actionsBar) actionsBar.style.display = "none";
 
@@ -909,7 +939,8 @@ document.addEventListener("alpuraDataLoaded", () => {
     const commercialName = document.getElementById("nombre-comercial").value.trim().replace(/[^A-Z0-9]/g, "_");
     const filename = `Solicitud_RTM_Alta_${commercialName}_${dateInput.value.replace(/\//g, "-")}.html`;
 
-    // Intentamos cargar el CSS para incrustarlo
+    // Intenta cargar el CSS para incrustarlo dentro del HTML.
+    // Así el archivo descargado mantiene el mismo diseño visual aunque no esté conectado.
     fetch('styles.css')
       .then(res => res.text())
       .then(cssContent => {
@@ -941,7 +972,8 @@ document.addEventListener("alpuraDataLoaded", () => {
     }
     .form-container { width: 100%; max-width: 1100px; }
     
-    /* Mejorar visualización de inputs deshabilitados para que parezcan fijos */
+    /* Los campos deshabilitados por defecto se ven grises en el navegador.
+       Esto los hace ver legibles como si fueran texto normal. */
     input:disabled, select:disabled, textarea:disabled {
       background-color: #f8fafc !important;
       color: #1a202c !important;
@@ -968,7 +1000,7 @@ document.addEventListener("alpuraDataLoaded", () => {
 <body>
   ${contentHtml}
   <script>
-    // Imprimir automáticamente al abrir el archivo
+  // Script que se ejecuta al abrir el archivo HTML descargado: muestra el diálogo de impresión.
     window.onload = function() {
       setTimeout(function() { window.print(); }, 500);
     };
@@ -988,7 +1020,7 @@ document.addEventListener("alpuraDataLoaded", () => {
 
       alert("Su solicitud se ha descargado en formato HTML.");
 
-      // Limpiar formulario
+      // Después de descargar, limpia todo el formulario para dejarlo listo para la siguiente captura
       form.reset();
       diasPagoCheckboxes.forEach(chk => chk.checked = false);
       diasPagoTrigger.textContent = "Seleccione días...";
@@ -1002,7 +1034,7 @@ document.addEventListener("alpuraDataLoaded", () => {
       dateInput.value = formattedDate;
       obsCounter.textContent = "0";
 
-      // Colocar el cursor al principio
+      // Manda el foco al primer campo del formulario para facilitar la siguiente captura
       window.scrollTo({ top: 0, behavior: "smooth" });
       const nombreInput = document.getElementById("nombre-social");
       if (nombreInput) nombreInput.focus();
@@ -1012,33 +1044,35 @@ document.addEventListener("alpuraDataLoaded", () => {
   });
 
 
-  // --- BOTÓN LIMPIAR FORMULARIO ---
+  // Botón "Limpiar Formulario": pide confirmación y borra todos los datos capturados.
+  // También restablece los campos dependientes (geo, comercial, fiscal) a su estado inicial.
   document.getElementById("btn-clear-form").addEventListener("click", () => {
     if (confirm("¿Está seguro de que desea limpiar todos los datos del formulario?")) {
       form.reset();
 
-      // Limpiar multiselección
+      // Desmarca todas las casillas de verificación de días de pago
       diasPagoCheckboxes.forEach(chk => chk.checked = false);
       diasPagoTrigger.textContent = "Seleccione días...";
 
-      // Limpiar campos geográficos y bloqueados
+      // Borra estado, municipio y colonias del selector de CP
       clearGeoFields();
       updateComercialFields("");
 
-      // Limpiar dependientes de CEDIS
+      // Reinicia los selectores de Plaza y Ruta que dependen del CEDIS seleccionado
       plazaSelect.innerHTML = '<option value="">Seleccione CEDIS primero...</option>';
       rutaSelect.innerHTML = '<option value="">Seleccione Ruta...</option>';
 
-      // Habilitar campos bloqueados por tipo factura
+      // Si el tipo de factura era GLOBAL, los campos fiscales quedaron bloqueados.
+      // Los habilitamos de nuevo para que el formulario esté listo.
       regimenSelect.disabled = false;
       regimenSelect.classList.remove("locked");
       usoCfdiSelect.disabled = false;
       usoCfdiSelect.classList.remove("locked");
 
-      // Limpiar errores visuales
+      // Quita todos los bordes rojos de error que pudieran quedar visibles
       document.querySelectorAll(".field-group").forEach(g => g.classList.remove("has-error"));
 
-      // Re-inicializar fecha
+      // Restaura la fecha a la fecha de hoy y reinicia el contador de caracteres
       dateInput.value = formattedDate;
       obsCounter.textContent = "0";
 
@@ -1051,10 +1085,10 @@ document.addEventListener("alpuraDataLoaded", () => {
     }
   });
 
-  // --- BOTÓN REGRESAR AL MENÚ ---
+  // Botón "Regresar al Menú": pide confirmación y lleva al menú principal limpiando el formulario.
   document.getElementById("btn-back-menu").addEventListener("click", () => {
     if (confirm("¿Desea regresar al menú principal y limpiar el formulario?")) {
-      // Re‑utilizar la lógica de limpieza
+      // Limpia todo antes de navegar (misma lógica que "Limpiar Formulario")
       form.reset();
       diasPagoCheckboxes.forEach(chk => chk.checked = false);
       diasPagoTrigger.textContent = "Seleccione días...";
@@ -1075,7 +1109,8 @@ document.addEventListener("alpuraDataLoaded", () => {
 
 
 
-  // --- LÓGICA DE SUCURSALES ---
+  // Lógica del formulario de Alta con Sucursales.
+  // Permite registrar múltiples puntos de entrega bajo un mismo cliente.
   const sucursalForm = document.getElementById("sucursal-form");
   const sucursalesContainer = document.getElementById("sucursales-container");
   const btnAddSucursal = document.getElementById("btn-add-sucursal");
@@ -1084,7 +1119,7 @@ document.addEventListener("alpuraDataLoaded", () => {
   const razonSocialInput = document.getElementById("suc-razon-social");
 
   if (numClienteInput && razonSocialInput) {
-    // Validaciones globales de sucursal
+    // Validación del número de cliente en tiempo real (5 o 6 dígitos)
     numClienteInput.addEventListener("input", (e) => {
       let val = e.target.value.replace(/[^0-9]/g, "");
       if (val.length > 6) val = val.substring(0, 6);
@@ -1103,9 +1138,10 @@ document.addEventListener("alpuraDataLoaded", () => {
       e.target.value = val;
     });
 
-    // Inicializar un bloque de sucursal
+    // Inicializa los selectores y eventos de un bloque de sucursal.
+    // Se llama tanto para el primer bloque como para cada bloque nuevo que se agrega.
     function initSucursalBlock(block) {
-      // Poblar selectores
+      // Obtiene referencias a todos los selectores del bloque
       const selectCedis = block.querySelector(".select-cedis");
       const selectPlaza = block.querySelector(".select-plaza");
       const selectZona = block.querySelector(".select-zona");
@@ -1132,7 +1168,7 @@ document.addEventListener("alpuraDataLoaded", () => {
       if (data.clasificacionesInternas) populate(selectClasif, data.clasificacionesInternas);
       if (data.segmentacionesMercado) populate(selectSegmentacion, data.segmentacionesMercado);
 
-      // Lógica CEDIS -> Plaza
+      // Al cambiar el CEDIS del bloque, actualiza la plaza y datos logísticos
       if (selectCedis && selectPlaza) {
         selectCedis.addEventListener("change", () => {
           const cedisVal = selectCedis.value;
@@ -1158,6 +1194,7 @@ document.addEventListener("alpuraDataLoaded", () => {
 
           if (cedisVal && data.cedis && data.cedis[cedisVal]) {
             const mapping = data.cedis[cedisVal];
+            // Para la mayoría de CEDIS: plaza única asignada automáticamente y bloqueada
             if (cedisVal !== "ANDEN PLANTA" && cedisVal !== "DISTRIBUIDORES") {
               selectPlaza.innerHTML = '';
               mapping.plazas.forEach(plaza => {
@@ -1199,7 +1236,8 @@ document.addEventListener("alpuraDataLoaded", () => {
         });
       }
 
-      // Filtros de input
+      // Limpia el valor de cada campo del bloque mientras el usuario escribe.
+      // Aplica las mismas reglas de caracteres que el formulario individual.
       block.querySelectorAll("input").forEach(input => {
         input.addEventListener("input", (e) => {
           let val = e.target.value;
@@ -1223,7 +1261,7 @@ document.addEventListener("alpuraDataLoaded", () => {
         });
       });
 
-      // Formato latitud / longitud
+      // Formatea latitud y longitud al salir del campo, igual que en el formulario individual.
       const latInput = block.querySelector("input[name='sucursal-latitud']");
       const lonInput = block.querySelector("input[name='sucursal-longitud']");
 
@@ -1260,7 +1298,8 @@ document.addEventListener("alpuraDataLoaded", () => {
         });
       }
 
-      // Lógica CP -> Colonia, Estado, Municipio
+      // Lógica de Código Postal para el bloque de sucursal:
+      // al escribir 5 dígitos, carga estado, municipio y colonias automáticamente.
       const cpInput = block.querySelector("input[name='sucursal-codigo-postal']");
       const coloniaSelect = block.querySelector("select[name='sucursal-colonia']");
       const estadoInput = block.querySelector("input[name='sucursal-estado']");
@@ -1300,11 +1339,11 @@ document.addEventListener("alpuraDataLoaded", () => {
       }
     }
 
-    // Inicializar primer bloque directamente, ya que ya nos encontramos dentro del manejador del evento alpuraDataLoaded
+    // El primer bloque ya está en el HTML; lo inicializamos aquí al arrancar.
     const firstBlock = document.querySelector(".sucursal-block");
     if (firstBlock) initSucursalBlock(firstBlock);
 
-    // Validar campos de un bloque
+    // Valida todos los campos de un bloque de sucursal antes de agregar otro o descargar.
     function validateBlock(block) {
       let isValid = true;
       block.querySelectorAll(".field-group").forEach(g => g.classList.remove("has-error"));
@@ -1388,10 +1427,11 @@ document.addEventListener("alpuraDataLoaded", () => {
       return isValid;
     }
 
-    // Agregar Sucursal
+    // Botón "Agregar Sucursal": valida el bloque actual y, si es correcto, duplica
+    // el bloque HTML creando una nueva sucursal limpia al final del formulario.
     if (btnAddSucursal) {
       btnAddSucursal.addEventListener("click", () => {
-        // Validar cabecera
+        // Verifica que el número de cliente tenga 5 o 6 dígitos antes de agregar
         const numCliente = numClienteInput.value.trim();
         if (numCliente.length !== 5 && numCliente.length !== 6) {
           numClienteInput.closest(".field-group").classList.add("has-error");
@@ -1399,7 +1439,7 @@ document.addEventListener("alpuraDataLoaded", () => {
           return;
         }
 
-        // Validar todos los bloques actuales
+        // Valida todos los bloques de sucursal que ya existen antes de agregar uno nuevo
         const blocks = document.querySelectorAll(".sucursal-block");
         let allValid = true;
         let onlyGeoErrors = true;
@@ -1437,7 +1477,7 @@ document.addEventListener("alpuraDataLoaded", () => {
           newBlock.setAttribute("data-index", newIndex);
           newBlock.querySelector(".sucursal-number").textContent = newIndex;
 
-          // Limpiar valores
+          // Limpia todos los valores del nuevo bloque para empezar en blanco
           newBlock.querySelectorAll("input, select").forEach(input => {
             input.value = "";
             if (input.name === "sucursal-colonia") input.innerHTML = '<option value="">Registre un C.P. primero</option>';
@@ -1460,10 +1500,54 @@ document.addEventListener("alpuraDataLoaded", () => {
       });
     }
 
-    // Generar Solicitud
+    // Botón "Limpiar / Eliminar": Si hay más de una sucursal, borra la última. 
+    // Si solo hay una, limpia todos sus campos y la cabecera.
+    const btnClearSucursal = document.getElementById("btn-clear-sucursal");
+    if (btnClearSucursal) {
+      btnClearSucursal.addEventListener("click", () => {
+        const blocks = document.querySelectorAll(".sucursal-block");
+        if (blocks.length > 1) {
+          if (confirm("¿Está seguro de que desea eliminar la última sucursal agregada?")) {
+            blocks[blocks.length - 1].remove();
+            // Desplazar a la nueva última sucursal
+            const newLastBlock = document.querySelectorAll(".sucursal-block")[blocks.length - 2];
+            if (newLastBlock) newLastBlock.scrollIntoView({ behavior: 'smooth', block: 'end' });
+          }
+        } else {
+          if (confirm("¿Está seguro de que desea limpiar todos los datos de la sucursal y la cabecera?")) {
+            const firstBlock = blocks[0];
+            if (firstBlock) {
+              firstBlock.querySelectorAll("input").forEach(input => {
+                input.value = "";
+                const grp = input.closest(".field-group");
+                if (grp) grp.classList.remove("has-error");
+              });
+              firstBlock.querySelectorAll("select").forEach(select => {
+                if (select.name === "sucursal-colonia") select.innerHTML = '<option value="">Registre un C.P. primero</option>';
+                else if (select.name === "sucursal-plaza") { select.innerHTML = '<option value="">Seleccione...</option>'; select.disabled = false; select.classList.remove("locked"); }
+                else if (select.name === "sucursal-unidad-facturacion") select.value = "PIEZAS";
+                else select.value = "";
+                const grp = select.closest(".field-group");
+                if (grp) grp.classList.remove("has-error");
+              });
+            }
+            if (numClienteInput) {
+              numClienteInput.value = "";
+              const grp = numClienteInput.closest(".field-group");
+              if (grp) grp.classList.remove("has-error");
+            }
+            if (razonSocialInput) razonSocialInput.value = "";
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }
+        }
+      });
+    }
+
+    // Botón "Descargar Solicitud" de Sucursales: valida todos los bloques y
+    // genera el HTML descargable con todos los datos de todas las sucursales.
     if (btnGenerateSucursal) {
       btnGenerateSucursal.addEventListener("click", () => {
-        // Validar cabecera
+        // Verifica número de cliente antes de descargar
         const numCliente = numClienteInput.value.trim();
         if (numCliente.length !== 5 && numCliente.length !== 6) {
           numClienteInput.closest(".field-group").classList.add("has-error");
@@ -1501,11 +1585,11 @@ document.addEventListener("alpuraDataLoaded", () => {
           }
         }
 
-        // Exportar a HTML
+        // Clona el formulario de sucursales, congela los valores y genera el HTML
         const originalContainer = document.querySelector("#sucursal-view .form-container");
         const containerClone = originalContainer.cloneNode(true);
 
-        // Sincronizar valores y bloquear inputs
+        // Copia los valores al clon y bloquea todos los campos
         const originalInputs = originalContainer.querySelectorAll("input, select, textarea");
         const clonedInputs = containerClone.querySelectorAll("input, select, textarea");
 
@@ -1576,7 +1660,7 @@ document.addEventListener("alpuraDataLoaded", () => {
 
           alert("Su solicitud se ha descargado en formato HTML.");
 
-          // Reset form
+          // Después de descargar, regresa el formulario a su estado inicial
           resetSucursalForm();
           setTimeout(() => URL.revokeObjectURL(url), 10000);
         }
@@ -1587,13 +1671,13 @@ document.addEventListener("alpuraDataLoaded", () => {
       sucursalForm.reset();
       numClienteInput.closest(".field-group").classList.remove("has-error");
 
-      // Remove extra blocks
+      // Borra todos los bloques de sucursal adicionales y deja solo el primero en blanco.
       const blocks = document.querySelectorAll(".sucursal-block");
       for (let i = 1; i < blocks.length; i++) {
         blocks[i].remove();
       }
 
-      // Reset first block
+      // Reinicia el primer bloque de sucursal a sus valores vacíos
       const firstBlock = document.querySelector(".sucursal-block");
       if (firstBlock) {
         firstBlock.querySelectorAll("input").forEach(input => {
